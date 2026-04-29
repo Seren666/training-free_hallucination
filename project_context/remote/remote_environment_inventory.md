@@ -151,3 +151,155 @@ Reason:
 - heavy baseline cloning or model downloads should happen only on the remote machine, not locally
 - if FLB or another baseline requires a different model family, prefer remote-only setup in a dedicated remote work directory
 
+## GPU instance verification
+
+> Verification date: 2026-04-29
+> Verification scope: login, GPU visibility, disk/memory, conda, PyTorch CUDA, old path existence, and minimal module/path checks only.
+> Password handling: no password was written into any local file, script, markdown, or Git commit.
+
+### New instance entry
+
+- host: `connect.westb.seetacloud.com`
+- port: `31048`
+- user: `root`
+- current container hostname: `autodl-container-3n631bugr0-97c149e4`
+- login status: success
+
+### GPU / driver / CUDA
+
+Direct `nvidia-smi` snapshot:
+
+- GPU model: `NVIDIA GeForce RTX 4090`
+- GPU count: `1`
+- VRAM: `49140 MiB`
+- current GPU memory use at verification time: `0 MiB / 49140 MiB`
+- current GPU utilization at verification time: `0%`
+- driver version: `580.105.08`
+- CUDA version reported by driver: `13.0`
+
+### Disk and memory
+
+Direct `df -h` snapshot:
+
+- `/`: `30G` total, about `27G` available
+- `/usr/bin/nvidia-smi` backing disk: `439G` total, about `400G` available
+- shared data mount: `AutoFS:fswestb1` at `/autodl-pub/data`, about `20T` total, about `18T` available
+- `/root/autodl-tmp`: exists
+
+Direct `free -h` snapshot:
+
+- RAM: `754 GiB` total
+- used: `107 GiB`
+- free: `322 GiB`
+- available: `632 GiB`
+- swap: `0`
+
+### Conda environments
+
+`conda env list` output showed:
+
+- `base` at `/root/miniconda3`
+- path environment at `/root/autodl-tmp/envs/vcd`
+
+Important note:
+
+- `conda activate vcd` failed because there is no environment registered under the short name `vcd`
+- `conda activate /root/autodl-tmp/envs/vcd` succeeded
+
+### PyTorch CUDA verification
+
+Inside `/root/autodl-tmp/envs/vcd`:
+
+- Python: `3.9.25`
+- Python path: `/root/autodl-tmp/envs/vcd/bin/python`
+- PyTorch: `2.0.1+cu118`
+- `torch.cuda.is_available()`: `True`
+- `torch.version.cuda`: `11.8`
+- `torch.cuda.device_count()`: `1`
+- detected device: `NVIDIA GeForce RTX 4090`
+- capability: `(8, 9)`
+
+Minimal CUDA smoke test:
+
+- `torch.randn(2, 2, device="cuda")`
+- tiny matrix multiplication
+- result: success
+
+### Old path existence check
+
+Confirmed existing paths on the new instance:
+
+- `/root/autodl-tmp`
+- `/root/autodl-tmp/code`
+- `/root/autodl-tmp/code/VCD`
+- `/root/autodl-tmp/hf-home`
+- `/root/autodl-tmp/code/VCD/experiments/checkpoints/llava-v1.5-7b`
+- `/root/autodl-tmp/code/VCD/experiments/data/POPE`
+- `/root/autodl-tmp/code/VCD/experiments/data/coco/val2014`
+- `/root/autodl-tmp/code/VCD/experiments/data/gqa/images`
+- `/root/autodl-tmp/code/VCD/experiments/data/POPE/aokvqa`
+- `/root/autodl-tmp/code/VCD/experiments/eval/object_hallucination_vqa_llava.py`
+- `/root/autodl-tmp/code/VCD/experiments/eval/eval_pope.py`
+- `/root/autodl-tmp/code/VCD/experiments/eval/mme_prepare.py`
+- `/root/autodl-tmp/code/VCD/experiments/eval/mme_format_results.py`
+- `/root/autodl-tmp/code/VCD/experiments/cd_scripts/llava1.5_pope.bash`
+
+Sample POPE annotation files confirmed:
+
+- `coco_pope_random.json`
+- `coco_pope_popular.json`
+- `coco_pope_adversarial.json`
+- `gqa_pope_random.json`
+- `aokvqa_pope_random.json`
+
+### Current module import status
+
+In the activated path environment:
+
+- `import transformers`: success
+- `import PIL`: success
+
+Direct import status without extra path setup:
+
+- `import llava`: failed
+- `import vcd_utils.vcd_sample`: failed because `llava` was not on `PYTHONPATH`
+
+Import status with repo-aware `PYTHONPATH`:
+
+- `PYTHONPATH=/root/autodl-tmp/code/VCD/experiments:/root/autodl-tmp/code/VCD`
+- `import llava`: success
+- `import vcd_utils.vcd_sample`: success
+
+Interpretation:
+
+- the codebase itself is present and usable
+- but the new instance currently needs the repo-aware `PYTHONPATH` convention documented before any actual script execution
+
+### Differences from the old handoff
+
+Compared with the old no-GPU instance and legacy notes:
+
+- SSH endpoint changed from `connect.westc.seetacloud.com:21607` to `connect.westb.seetacloud.com:31048`
+- GPU is now available and healthy
+- old path layout is still preserved under `/root/autodl-tmp/code/VCD`
+- the `vcd` environment still exists by path, but `conda activate vcd` does not work by short name on this instance
+- direct module imports now require explicit `PYTHONPATH` pointing at both:
+  - `/root/autodl-tmp/code/VCD`
+  - `/root/autodl-tmp/code/VCD/experiments`
+
+### Readiness judgment
+
+Current judgment:
+
+- the new GPU instance is suitable for the next phase of environment-level work
+- it is also suitable to begin FLB preparation or one-forward signal-audit preparation
+- before any real run, the activation instructions should be normalized to:
+
+```bash
+source /root/miniconda3/etc/profile.d/conda.sh
+conda activate /root/autodl-tmp/envs/vcd
+export PYTHONPATH=/root/autodl-tmp/code/VCD/experiments:/root/autodl-tmp/code/VCD:${PYTHONPATH}
+```
+
+This is enough to move into the next stage without downloading anything locally and without running any formal experiment yet.
+
