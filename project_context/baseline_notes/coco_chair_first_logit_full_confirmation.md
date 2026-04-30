@@ -98,6 +98,22 @@ Runtime state at report time:
 - `full regular` stage is now running
 - `full first_logit` has not started yet because the pipeline is sequential on a single GPU
 
+Latest remote checkpoint after launch:
+
+- latest observed `full regular` progress:
+  - `1150 / 40504`
+- current GPU:
+  - `NVIDIA GeForce RTX 4090 49GB`
+- current observed GPU utilization:
+  - about `98%`
+- current observed reserved memory:
+  - about `14.04 GB`
+- rough single-GPU ETA at the latest check:
+  - regular remaining: about `14.33 h`
+  - full paired remaining: about `29.07 h`
+
+This means the run is progressing normally, but the full paired confirmation is still in flight and should not be over-claimed before the final `full` metrics are materialized.
+
 ## 5. 500 / 1000 Trend Table
 
 Table 1: Main metrics
@@ -331,4 +347,3 @@ At this moment:
 - continue `first_logit`: `yes`
 - switch immediately away from it: `no`
 - stop the full run: `no`
-
