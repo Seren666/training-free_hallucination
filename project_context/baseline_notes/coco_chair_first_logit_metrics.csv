@@ -1,0 +1,3 @@
+Method,Images,CHAIRs,CHAIRi,Avg Caption Length,Object Mentions,Hallucinated Object Count,s/sample
+regular,100,0.21,0.0533,49.91,450,24,1.2993
+first_logit,100,0.15,0.0465,51.31,452,21,1.2961
