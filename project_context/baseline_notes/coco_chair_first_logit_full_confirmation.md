@@ -795,6 +795,8 @@ What is supported by this full run:
 - the gain is not explained by lower overall object mention counts
 - the first generated token remains unchanged
 - the direction is therefore worth continuing as a serious caption-side baseline
+- the current best label is:
+  - `promising early-anchor intervention candidate`
 
 What is not yet supported:
 
@@ -812,3 +814,4 @@ Recommended next steps after this completed full confirmation:
 3. return to `one-forward signal audit` as the analysis track
 4. avoid immediate parameter sweep
 5. avoid over-claiming this as the final method before mechanism and robustness checks
+6. do not treat this as proof that the final paper method is already solved
