@@ -1,0 +1,5 @@
+Evaluator,Method,Images,CHAIRs,CHAIRi,AvgCaptionLength,ObjectMentions,HallucinatedObjects
+adapted,regular,40504,0.2037,0.0655,49.6823,181268,11875
+adapted,first_logit,40504,0.1631,0.0513,50.9320,187440,9609
+near_official,regular,40504,0.1997,0.0669,49.3534,172330,11528
+near_official,first_logit,40504,0.1594,0.0524,50.5482,178315,9337

@@ -173,57 +173,123 @@ So any residual evaluator mismatch with official CHAIR should mostly affect abso
 
 ## 8. Can We Directly Run The Official Script Right Now?
 
-Not cleanly, not in the current environment, and not without extra setup.
+Not cleanly in the current environment.
 
-Blocking points:
+Direct-run blockers confirmed on remote:
 
-- remote env currently lacks:
-  - `pattern`
+- `chair.py` is Python2-era and fails Python3 compilation because of old `print` syntax
+- the current `vcd` environment does not have:
   - `nltk`
-- the official-style code is Python2-era
-- it expects caption-eval style input with `imgToEval` and caption-quality metrics already populated
-- our current full caption files are lightweight caption payloads, not official caption-eval outputs
+  - `pattern`
+- the official-style code expects caption-eval style `imgToEval` input with metric fields
+- the current full caption files are lightweight caption payloads, not official caption-eval outputs
 
-So this round did not run the untouched official CHAIR evaluator on the full captions.
+So this round still did not execute the untouched official CHAIR evaluator directly.
 
-## 9. Credibility Judgment
+## 9. Near-Official Alignment Run
+
+A near-official alignment path was completed successfully without rerunning generation.
+
+Remote alignment workspace:
+
+- `/root/autodl-tmp/code/training_free_hallucination_probe/chair_alignment`
+
+Remote alignment result files:
+
+- `/root/autodl-tmp/code/training_free_hallucination_probe/results/chair_alignment_regular_eval.json`
+- `/root/autodl-tmp/code/training_free_hallucination_probe/results/chair_alignment_first_logit_eval.json`
+- `/root/autodl-tmp/code/training_free_hallucination_probe/results/chair_alignment_metrics.csv`
+- `/root/autodl-tmp/code/training_free_hallucination_probe/results/chair_alignment_metrics.md`
+
+Artifact caveat:
+
+- a summary json was emitted remotely with a stray carriage-return suffix in its filename
+- it is not needed for the result comparison
+- the authoritative outputs are the two `*_eval.json` files plus `metrics.csv` / `metrics.md`
+
+Near-official implementation choices:
+
+- official `synonyms.txt`
+- official-style double-word and special-case object rules
+- combined `train2014 + val2014` GT caption / instance annotations
+- converted official-like `imgToEval` payload
+- vendored `nltk` tokenizer path
+- custom singularizer fallback because `pattern.en` was unavailable
+
+Actual runtime modes:
+
+- tokenizer:
+  - `nltk_word_tokenize`
+- singularizer:
+  - `custom`
+
+## 10. Adapted Vs Near-Official Comparison
+
+| Evaluator | Method | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Objects |
+|---|---|---:|---:|---:|---:|---:|---:|
+| adapted | regular | 40504 | 0.2037 | 0.0655 | 49.6823 | 181268 | 11875 |
+| adapted | first_logit | 40504 | 0.1631 | 0.0513 | 50.9320 | 187440 | 9609 |
+| near_official | regular | 40504 | 0.1997 | 0.0669 | 49.3534 | 172330 | 11528 |
+| near_official | first_logit | 40504 | 0.1594 | 0.0524 | 50.5482 | 178315 | 9337 |
+
+Delta vs regular:
+
+- adapted:
+  - `CHAIRs`: `-0.0406`
+  - `CHAIRi`: `-0.0142`
+- near-official:
+  - `CHAIRs`: `-0.0403`
+  - `CHAIRi`: `-0.0145`
+
+Judgment:
+
+- improvement direction is the same
+- improvement magnitude is very close
+- evaluator changes slightly move the absolute values
+- evaluator changes do not reverse the method ranking
+
+## 11. Credibility Judgment
 
 Current judgment:
 
-- the adapted evaluator is credible enough for internal paired comparison and mechanism analysis
-- the main qualitative conclusion is trustworthy:
-  - `first_logit` lowers `CHAIRs` and `CHAIRi` on the full `40504`-image COCO-CHAIR run under the current evaluation protocol
-- the current result should still be described as:
-  - `adapted CHAIR-style evaluator result`
-  - not yet an untouched official CHAIR script result
+- the adapted evaluator remains credible for internal paired comparison and mechanism analysis
+- the near-official alignment materially strengthens confidence in the full COCO-CHAIR result
+- the main qualitative conclusion still holds:
+  - `first_logit` lowers `CHAIRs` and `CHAIRi` on full `40504`-image COCO-CHAIR
+- the current result should now be described as:
+  - `adapted evaluator result confirmed by near-official alignment`
+  - not yet an untouched official CHAIR execution
 
 Recommended phrasing for current result quality:
 
 - good enough for research direction filtering
-- good enough for mechanism analysis
-- not yet the final paper-level protocol claim
+- strong enough to justify mechanism analysis
+- still short of the strictest paper-level protocol claim
 
-## 10. What Still Needs To Be Done For Paper-Level Alignment
+## 12. What Still Needs To Be Done For Paper-Level Alignment
 
 If later we want stronger protocol alignment, the next steps should be:
 
 1. provision a clean official-compatible CHAIR environment
-   - or make a more explicit faithful port of the official tokenizer / singularizer path
+   - ideally with Python2-compatible execution or an explicitly validated faithful port
 
-2. prepare official-style caption-eval input format for the existing captions
-   - no new generation needed
+2. restore official-style singularization as closely as possible
+   - `pattern.en` or a validated substitute
 
 3. rerun CHAIR scoring only on the existing `regular` and `first_logit` full captions
+   - no new generation needed
 
 4. compare:
    - adapted evaluator numbers
-   - official or near-official alignment numbers
+   - near-official alignment numbers
+   - untouched official or validated official-port numbers
 
-## 11. Bottom Line
+## 13. Bottom Line
 
-The adapted evaluator is not identical to the untouched official CHAIR code, but it is strongly aligned on the core hallucination logic and does not show an obvious bias favoring `regular` or `first_logit`.
+The adapted evaluator is not identical to the untouched official CHAIR code, but it is strongly aligned on the core hallucination logic and it does not show an obvious bias favoring `regular` or `first_logit`.
 
-For the current project stage:
+After the near-official alignment run:
 
-- the paired full COCO-CHAIR result is credible
-- the absolute metric values should still carry an evaluator-alignment caveat
+- the paired full COCO-CHAIR result remains credible
+- the positive `first_logit` direction survives a more official-like evaluation path
+- the absolute metric values should still carry an official-alignment caveat
