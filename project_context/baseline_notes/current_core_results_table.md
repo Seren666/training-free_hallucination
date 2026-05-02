@@ -154,6 +154,7 @@ Follow-up takeaway:
 - the current `attention_gated_attnanchor` pilot also does not improve on fixed `first_logit`
 - the current `candidate_local_guard` pilot is the narrowest and healthiest selective follow-up so far, but still does not improve on fixed `first_logit`
 - the current `middle_verified` pilot is even narrower and preserves mentions better, but still does not improve on fixed `first_logit`
+- the current `middle_refined` pilot is a different anchor-construction family, but it also does not improve on fixed `first_logit`
 - the current `attention_shape_guard` route does not justify runtime generation yet
 - fixed `first_logit` remains the strongest decoding result so far
 
@@ -174,6 +175,7 @@ Follow-up takeaway:
 - step-level low-attention object-token gating is still too coarse in its current form
 - current top-k candidate-local gating is better, but still not local enough
 - middle-layer verification makes the gate narrower, but token-level boost clipping still does not beat the fixed trajectory
+- anchor construction is a more meaningful new family than token-level clipping, but the current step0 low-attention `middle_refined` rule still broadens into source-level object suppression
 - diffuse attention-shape alone is not strong enough to justify a runtime guard
 - future selectivity has to move closer to the actual candidate object token or mention-local decision
 - a method can be more selective than `Object-Safe` and still fail if it suppresses too many valid object mentions
@@ -188,15 +190,16 @@ Follow-up takeaway:
 - do not expand the current `attention_gated_attnanchor` rule to full scale
 - do not expand the current `candidate_local_guard` rule to full scale
 - do not expand the current `middle_verified` rule to full scale
+- do not expand the current `middle_refined` rule to full scale
 - do not start `attention_shape_guard` generation from the current offline signal alone
 
 ## 11. Current Recommended Next Step
 
 1. keep fixed `first_logit / early-anchor` as the best current decoding baseline
-2. treat `object_safe_anchor`, `attention_gated_attnanchor`, `candidate_local_guard`, and `middle_verified` as increasingly narrow but still negative selective pilots
-3. keep the middle-layer audit as mechanism evidence, but do not assume it already gives a working runtime clipping rule
-4. if method work continues, it needs a materially different family than token-level boost clipping
-5. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
+2. treat `object_safe_anchor`, `attention_gated_attnanchor`, `candidate_local_guard`, and `middle_verified` as increasingly narrow but still negative clipping pilots
+3. treat `middle_refined` as a negative anchor-construction pilot: more meaningful than clipping, but still broad in its current form
+4. keep the middle-layer audit as mechanism evidence, but do not assume it already gives a working runtime or anchor-construction rule
+5. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot without object-mention collapse
 6. do not immediately start parameter sweep, new benchmark expansion, or classifier work
 
 ## 12. Dual-Trajectory Mention Selection Feasibility
@@ -261,3 +264,25 @@ Pilot takeaway:
 - `CHAIRi` regresses from `0.0509` to `0.0555`
 - hallucinated object count increases from `240` to `258`
 - removed hallucinations (`18`) are outnumbered by introduced hallucinations (`36`)
+
+## 15. Middle-Refined Early Anchor Pilot
+
+| Stage | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Current Status |
+|---|---:|---:|---:|---:|---:|---:|---|
+| feasibility | 4000 event subset | - | - | - | - | - | supportive offline signal; `introduced flag rate 0.254` vs `correct 0.102` |
+| 10 sanity | 10 | 0.2000 | 0.0625 | 49.9000 | 32 | 2 | implementation/runtime sanity only; broad source refinement already visible |
+| 1000 pilot | 1000 | 0.1640 | 0.0541 | 51.2880 | 4267 | 231 | more meaningful than clipping family, but still worse than fixed `first_logit`; stopped before full |
+
+Pilot takeaway:
+
+- offline feasibility was genuinely cleaner than flat `Object-Safe`
+- but the runtime anchor rule broadened heavily:
+  - avg refined object tokens per image: `141.93`
+  - avg step0 low-attention trigger rate: `0.978`
+- raw hallucinated object count improved slightly vs fixed `first_logit`:
+  - `231` vs `240`
+- but object mentions and correct mentions collapsed too much:
+  - object mentions delta vs fixed: `-450`
+  - correct object mentions delta vs fixed: `-441`
+- `CHAIRs` and `CHAIRi` still regress vs fixed `first_logit`
+- so current `middle_refined` is best viewed as a negative anchor-construction pilot, not a new best method
