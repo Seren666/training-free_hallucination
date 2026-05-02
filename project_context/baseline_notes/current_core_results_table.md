@@ -286,3 +286,29 @@ Pilot takeaway:
   - correct object mentions delta vs fixed: `-441`
 - `CHAIRs` and `CHAIRi` still regress vs fixed `first_logit`
 - so current `middle_refined` is best viewed as a negative anchor-construction pilot, not a new best method
+
+## 16. Current 1000-Image Method Comparison
+
+| Method | Family | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Status |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| `regular` | baseline | 1000 | 0.2090 | 0.0657 | 49.6580 | 4522 | 297 | reference baseline |
+| `fixed first_logit` | early-anchor main line | 1000 | 0.1610 | 0.0509 | 50.9190 | 4717 | 240 | strongest current method candidate |
+| `object_safe_anchor` | flat object suppression | 1000 | 0.1620 | 0.0530 | 51.3090 | 4228 | 224 | lower raw hallucination count, but worse than fixed |
+| `previous_attention_gated` | step-level attention gate | 1000 | 0.1680 | 0.0575 | 51.1140 | 4329 | 249 | too broad; worse than fixed |
+| `candidate_local_guard` | top-k candidate clipping | 1000 | 0.1680 | 0.0555 | 51.0600 | 4431 | 246 | narrower, but still worse than fixed |
+| `middle_verified` | middle-layer token clipping | 1000 | 0.1770 | 0.0555 | 51.0110 | 4645 | 258 | best mention preservation among clipping pilots, but still worse than fixed |
+| `middle_refined` | anchor-construction refinement | 1000 | 0.1640 | 0.0541 | 51.2880 | 4267 | 231 | different family, but still worse than fixed |
+
+Comparison takeaway:
+
+- fixed `first_logit / early-anchor` remains the strongest current decoding result
+- some guards reduce raw hallucinated-object count slightly, but none improve the main CHAIR metrics over fixed `first_logit`
+- the recurring cost is object-mention and correct-object collapse
+- current token-level suppression and broad anchor-cleaning guard variants should stop here
+
+## 17. Current Position
+
+- treat fixed `first_logit / early-anchor` as the current main method candidate
+- treat `object_safe_anchor`, `attention_gated_attnanchor`, `candidate_local_guard`, `middle_verified`, and `middle_refined` as informative negative follow-ups
+- do not continue token-level boost clipping, broad object suppression, or broad anchor-cleaning guard expansion
+- next work should focus on validating the main early-anchor result rather than searching for another guard variant in the same family
