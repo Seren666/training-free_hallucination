@@ -78,21 +78,36 @@ Object-level takeaway:
 - object-local signals are much more informative than coarse image-level scalars
 - the mechanism story now looks object-token-level, not image-level
 
-## 7. Current Main Conclusions
+## 7. Object-Safe Anchor Pilot
 
-### 7.1 Benchmark split
+| Stage | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Current Status |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 1000 pilot | 1000 | 0.1620 | 0.0530 | 51.3090 | 4228 | 224 | did not beat fixed `first_logit`; stopped before full |
+
+Pilot takeaway:
+
+- raw hallucinated object count improves slightly vs fixed `first_logit`
+- but `CHAIRs` is slightly worse and `CHAIRi` is worse
+- object mentions drop by `489`
+- correct object mentions drop by `473`
+- so the current flat object-token positive-boost scaling is too blunt
+
+## 8. Current Main Conclusions
+
+### 8.1 Benchmark split
 
 - `COCO-CHAIR` is now the main positive benchmark for `first_logit / early-anchor`
 - `POPE` is retained for one-forward signal audit, not for later-step first-logit intervention scoring
 - `AMBER` remains deferred
 
-### 7.2 Method status
+### 8.2 Method status
 
 - `first_logit / early-anchor` is a promising intervention candidate
 - it is not yet the final paper method
 - it should not yet be presented as a fully established final conclusion
+- the current `object_safe_anchor` pilot does not yet improve on fixed `first_logit`
 
-### 7.3 Why the current COCO-CHAIR result matters
+### 8.3 Why the current COCO-CHAIR result matters
 
 - the effect remains positive from `100` to `500` to `1000` to `40504`
 - `CHAIRs` and `CHAIRi` both improve
@@ -103,16 +118,17 @@ Object-level takeaway:
 - near-official alignment preserves the same positive direction
 - object-level local signals now provide mechanism evidence
 
-### 7.4 What is no longer the main line
+### 8.4 What is no longer the main line
 
 - do not continue old `VCD / RAD-VCD` as the main paper line
 - do not keep tuning `POPE first_logit`
 - do not use `The effect` as the main explanation path
 - do not treat coarse image-level scalars as a viable selector
+- do not expand the current flat `object_safe_anchor` rule to full scale
 
-## 8. Current Recommended Next Step
+## 9. Current Recommended Next Step
 
-1. consolidate the mechanism story in writing
-2. keep evaluator alignment and small cross-checks as the next validation layer
-3. only later consider a tightly controlled object-local selective prototype
+1. use the negative `object_safe_anchor` pilot as evidence that flat object-token dampening is too coarse
+2. keep mechanism design focused on object-local selectivity rather than global object suppression
+3. only later consider a tighter object-local selective prototype
 4. do not immediately start parameter sweep, new benchmark expansion, or classifier work
