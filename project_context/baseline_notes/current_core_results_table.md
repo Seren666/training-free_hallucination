@@ -153,6 +153,7 @@ Follow-up takeaway:
 - the current `object_safe_anchor` pilot does not improve on fixed `first_logit`
 - the current `attention_gated_attnanchor` pilot also does not improve on fixed `first_logit`
 - the current `candidate_local_guard` pilot is the narrowest and healthiest selective follow-up so far, but still does not improve on fixed `first_logit`
+- the current `middle_verified` pilot is even narrower and preserves mentions better, but still does not improve on fixed `first_logit`
 - the current `attention_shape_guard` route does not justify runtime generation yet
 - fixed `first_logit` remains the strongest decoding result so far
 
@@ -172,6 +173,7 @@ Follow-up takeaway:
 - flat object-vocab positive-boost suppression is too coarse
 - step-level low-attention object-token gating is still too coarse in its current form
 - current top-k candidate-local gating is better, but still not local enough
+- middle-layer verification makes the gate narrower, but token-level boost clipping still does not beat the fixed trajectory
 - diffuse attention-shape alone is not strong enough to justify a runtime guard
 - future selectivity has to move closer to the actual candidate object token or mention-local decision
 - a method can be more selective than `Object-Safe` and still fail if it suppresses too many valid object mentions
@@ -185,15 +187,17 @@ Follow-up takeaway:
 - do not expand the current flat `object_safe_anchor` rule to full scale
 - do not expand the current `attention_gated_attnanchor` rule to full scale
 - do not expand the current `candidate_local_guard` rule to full scale
+- do not expand the current `middle_verified` rule to full scale
 - do not start `attention_shape_guard` generation from the current offline signal alone
 
 ## 11. Current Recommended Next Step
 
 1. keep fixed `first_logit / early-anchor` as the best current decoding baseline
-2. treat `object_safe_anchor`, `attention_gated_attnanchor`, and `candidate_local_guard` as increasingly narrow but still negative selective pilots
-3. if method work continues, move to an even tighter candidate-object or mention-local intervention
-4. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
-5. do not immediately start parameter sweep, new benchmark expansion, or classifier work
+2. treat `object_safe_anchor`, `attention_gated_attnanchor`, `candidate_local_guard`, and `middle_verified` as increasingly narrow but still negative selective pilots
+3. keep the middle-layer audit as mechanism evidence, but do not assume it already gives a working runtime clipping rule
+4. if method work continues, it needs a materially different family than token-level boost clipping
+5. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
+6. do not immediately start parameter sweep, new benchmark expansion, or classifier work
 
 ## 12. Dual-Trajectory Mention Selection Feasibility
 
@@ -234,4 +238,26 @@ Middle-layer takeaway:
 - correct mentions are not only better at the final step; they already look better in the middle stage
 - introduced hallucinations appear more like anchor-pushed mentions without matching middle-layer verification
 - removed hallucinations are consistent with late-stage over-mention that fixed `first_logit` can correct
-- if method work continues, `Middle-Verified Early Anchor` is now the most justified next `1000` pilot
+- the audit justified a `Middle-Verified Early Anchor` pilot, but the pilot still did not beat fixed `first_logit`
+
+## 14. Middle-Verified Early Anchor Pilot
+
+| Stage | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Current Status |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 10 sanity | 10 | 0.5000 | 0.1136 | 49.4000 | 44 | 5 | implementation/runtime sanity only |
+| 1000 pilot | 1000 | 0.1770 | 0.0555 | 51.0110 | 4645 | 258 | narrower and healthier than prior guards, but still worse than fixed `first_logit`; stopped before full |
+
+Pilot takeaway:
+
+- the gate is much narrower than previous broad attention gating:
+  - about `3.932` gate-trigger steps per image
+  - about `3.962` gated candidates per image
+  - gated candidate ratio about `0.1196`
+- it avoids the earlier object-mention collapse much better:
+  - object mentions delta vs fixed `first_logit`: `-72`
+  - correct object mentions delta vs fixed `first_logit`: `-90`
+- but it still does not beat fixed `first_logit`
+- `CHAIRs` regresses from `0.1610` to `0.1770`
+- `CHAIRi` regresses from `0.0509` to `0.0555`
+- hallucinated object count increases from `240` to `258`
+- removed hallucinations (`18`) are outnumbered by introduced hallucinations (`36`)
