@@ -214,3 +214,24 @@ Dual-trajectory takeaway:
 - caption-level rollback is cleaner than token-level suppression conceptually
 - but the actual rollback boundary, `first_logit-only hallucinated` vs `first_logit-only correct`, is too noisy under the current simple support signals
 - so this route currently stops at feasibility and does not replace fixed `first_logit`
+
+## 13. Middle-Layer Object-Token Audit
+
+| Item | Result |
+|---|---|
+| scope | existing 4000-event object-local subset plus new middle/late rank-lens supplement |
+| generation rerun | no |
+| main positive finding | correct mentions are already stronger in middle-layer target rank and middle-layer visual attention |
+| introduced vs correct | `middle_target_rank_mean: 6098.926 vs 3533.189`, `image_attention_middle_mean: 0.145080 vs 0.183550` |
+| removed vs correct | `middle_target_rank_mean: 4422.097 vs 3533.189`, `middle_to_late_rank_improvement: 4251.176 vs 3485.976` |
+| introduced vs removed | introduced still has stronger anchor-side push: `anchor_adjustment_delta 1.151627 vs 0.978613`, `adjusted_target_rank_if_applied 1.021 vs 1.467` |
+| attention shape | stronger than raw mass alone; best current shape signal is `mass_change_late_minus_mid` with `abs(AUC-0.5)=0.3113` for `introduced vs correct` |
+| hidden-image cosine | weaker than middle-layer rank and attention signals as a standalone separator |
+| current conclusion | middle layers look like a promising verification surface for a constrained next pilot |
+
+Middle-layer takeaway:
+
+- correct mentions are not only better at the final step; they already look better in the middle stage
+- introduced hallucinations appear more like anchor-pushed mentions without matching middle-layer verification
+- removed hallucinations are consistent with late-stage over-mention that fixed `first_logit` can correct
+- if method work continues, `Middle-Verified Early Anchor` is now the most justified next `1000` pilot

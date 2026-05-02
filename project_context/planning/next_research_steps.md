@@ -44,6 +44,7 @@ If method work continues:
 
 - move closer to the actual candidate object token or mention-local decision
 - avoid broad gating over a large object-token vocabulary on many late steps
+- prefer a middle-layer verification surface over coarse image-level or caption-level routing
 
 The next prototype should be narrower than:
 
@@ -62,6 +63,7 @@ Likely implication from this round:
 - the next useful method probably has to reason over the specific object phrase or mention boundary
 - not just token-id membership plus a coarse score threshold
 - if dual-trajectory is revisited, it should likely be phrase-level fusion or mention-level verification, not whole-caption fallback
+- the most justified next prototype is now a constrained `Middle-Verified Early Anchor` pilot on `1000` COCO-CHAIR images
 
 ### C. Third: keep pilot discipline strict
 
@@ -128,9 +130,10 @@ Reason:
    - `candidate_local_guard`
 3. record that `attention_shape_guard` currently stops at offline feasibility
 4. design a narrower object-local prototype only if it is materially different from broad or semi-broad object-token dampening
-5. do not launch simple caption-level dual-trajectory rollback from the current weak-support signals
-6. use `1000` pilot gates before any new full COCO-CHAIR run
-7. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
+5. if method work continues, prioritize one `Middle-Verified Early Anchor` `1000` pilot before any broader expansion
+6. do not launch simple caption-level dual-trajectory rollback from the current weak-support signals
+7. use `1000` pilot gates before any new full COCO-CHAIR run
+8. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
 
 ## 5. Current Research Posture
 
@@ -142,4 +145,5 @@ Best current framing:
 - but the current selective prototypes are still not local enough to beat the fixed baseline
 - attention-shape signal seems real but not strong enough by itself for a runtime guard
 - simple dual-trajectory caption-level fallback is cleaner in framing, but its `first_only` support boundary is too weak for rollout
+- the new middle-layer audit is the first follow-up that clearly strengthens a more local verification story
 - future method work should become more local, not more global
