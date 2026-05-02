@@ -1,7 +1,7 @@
 # Next Research Steps
 
-> Date: 2026-05-02
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, stopping the guard family, and completing both the first attention-distribution audit and the first paired regular-vs-early-anchor internal audit.
+> Date: 2026-05-03
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, stopping the guard family, completing the internal-signal audits, and testing the first layer-wise anchor replacement route.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -31,6 +31,9 @@ Immediate focus:
 - keep the internal-signal line active, but do not jump from descriptive evidence to a runtime selector
 - treat `first_logit`-side object-local middle verification as the main positive signal surface
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
+- treat the new layer-wise anchor result as a useful negative method result:
+  - late-layer ensemble anchors can look cleaner offline
+  - but always-on anchor replacement still underperforms fixed `first_logit` at 1000 images
 
 Current strongest families to build on:
 
@@ -39,6 +42,9 @@ Current strongest families to build on:
 - anchor-plus-verification interaction
 - controlled visual sensitivity with random-mask comparison
 - first-logit-gap x verification-evolution interaction
+- layer-group comparisons as a descriptive audit surface, especially:
+  - `late_27_31` target-logit support
+  - shallow / early-middle image-attention mass
 
 Signals to de-prioritize as standalone rules:
 
@@ -46,6 +52,8 @@ Signals to de-prioritize as standalone rules:
 - pure concentration alone
 - another broad guard based on low attention or object-token membership
 - any shared-event trajectory-delta heuristic that is weak in the paired audit
+- simple middle-weak plus late-strong trigger rules
+- always-on layer-anchor replacement without stronger runtime evidence
 
 ### B. Second: validate signal stability before designing correction
 
@@ -75,6 +83,7 @@ This means:
 
 - early-anchor stays fixed
 - the research surface moves to internal measurement
+- layer-wise anchor signals can still be audited, but not promoted to a new default decoding anchor yet
 
 ### D. Fourth: keep the failed guard family paused
 
@@ -85,12 +94,14 @@ Stay paused:
 - `candidate_local_guard`
 - `middle_verified`
 - `middle_refined`
+- broad always-on layer-anchor replacement as a new main-line decoding method
 
 Why:
 
 - none beat fixed `first_logit`
 - the recurring cost remained object-mention or correct-object collapse
 - the new attention-distribution audit does not justify returning to that family
+- the new layer-wise anchor audit is mechanistically interesting, but the best 1000 pilot still regresses on CHAIR
 
 ### E. Fifth: only resume correction-method design when the signal side is stronger
 
@@ -106,6 +117,7 @@ That means:
 Likely acceptable future directions, if justified later:
 
 - first-logit-side object-local middle verification
+- layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
 - phrase-level or trajectory-level methods only if the method boundary becomes much cleaner than the current shared-delta story
 
@@ -120,6 +132,8 @@ Not now:
 - no classifier training
 - no new benchmark branch for this question
 - no attempt to turn weak entropy-only effects into a runtime controller
+- no immediate second round of layer-anchor replacement tuning
+- no immediate mismatch-trigger runtime implementation
 
 ## 4. Current Recommendation
 
@@ -128,4 +142,6 @@ Not now:
 3. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
 4. treat visual sensitivity as supporting verification, not a standalone rule
 5. do not turn the current weak shared-event trajectory deltas into a runtime controller
-6. only return to correction methods when the signal side is clearly strong enough to justify a new action unit
+6. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
+7. do not turn the current mismatch signals into a runtime controller yet
+8. only return to correction methods when the signal side is clearly strong enough to justify a new action unit

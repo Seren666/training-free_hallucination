@@ -298,6 +298,7 @@ Pilot takeaway:
 | `candidate_local_guard` | top-k candidate clipping | 1000 | 0.1680 | 0.0555 | 51.0600 | 4431 | 246 | narrower, but still worse than fixed |
 | `middle_verified` | middle-layer token clipping | 1000 | 0.1770 | 0.0555 | 51.0110 | 4645 | 258 | best mention preservation among clipping pilots, but still worse than fixed |
 | `middle_refined` | anchor-construction refinement | 1000 | 0.1640 | 0.0541 | 51.2880 | 4267 | 231 | different family, but still worse than fixed |
+| `layer_anchor_late_27_31_rank_average` | always-on layer-anchor replacement | 1000 | 0.1800 | 0.0552 | 50.2880 | 4659 | 257 | best offline layer-anchor candidate, but still worse than fixed |
 
 Comparison takeaway:
 
@@ -391,3 +392,20 @@ Current correction-facing candidates:
 - `anchor_masschange_x_late_mass`
 - `late_image_attention_recovery_ratio`
 - `middle_image_attention_mean`
+
+## 21. Layer-Wise Anchor Audit
+
+| Audit | Scope | Main Result | Current Conclusion |
+|---|---|---|---|
+| layer-group object-step audit | balanced `4000`-event subset; groups `shallow_0_4`, `visual_enrichment_5_18`, `semantic_refinement_19_26`, `middle_all_5_26`, `late_27_31` | strongest introduced-vs-correct object-step logit-lens signal is `obj_late_27_31_target_logit_mean` with `abs(AUC-0.5)=0.2523`; strongest attention signal is `attn_shallow_0_4_image_mass_mean` with `0.3250`; strongest middle-late transition signal is `middle_to_late_mass_change` with `0.2574` | layer-wise evidence is informative, but it does not yet identify a replacement decoding anchor by itself |
+| layer-ensemble anchor offline comparison | full layer-anchor support comparison over the same `4000`-event audit | best offline candidates are `late_27_31 + rank_average` with selection score `1.0180` and `late_27_31 + z_normalized_logits` with `1.0140`, both above fixed `firstlogit` at `0.9188` | late-layer ensemble anchors can look cleaner offline than fixed first-logit on support separation |
+| Branch A runtime pilot | 10-image sanity for two candidates, then 1000 pilot for the stronger candidate | `late_27_31 + rank_average` 1000 pilot reaches `CHAIRs=0.1800`, `CHAIRi=0.0552`, `Object Mentions=4659`, `Hallucinated Object Count=257` | the best offline candidate still fails to beat fixed `first_logit` (`0.1610 / 0.0509 / 4717 / 240`), so no full run |
+| Branch B mismatch feasibility | offline-only trigger analysis from the cleaned layer-group audit | strongest descriptive mismatch signals are `middle_to_late_mass_change=0.2574`, `middle_x_mass_change=0.2503`, `attn_middle_all_5_26_image_mass_mean=0.2213`; simple combined trigger hit is only `0.015` on introduced vs `0.002` false-hit on correct | mismatch is informative but not yet strong enough to justify a runtime trigger |
+
+Layer-wise takeaway:
+
+- `late_27_31` is the most informative current logit-lens anchor group
+- `shallow_0_4` and `visual_enrichment_5_18` are stronger from the attention-mass side than from direct anchor support
+- offline support separation can improve while caption-time CHAIR still gets worse
+- always-on layer-anchor replacement therefore does not currently beat fixed `first_logit`
+- middle-late mismatch should remain an analysis signal, not a runtime method in the current state
