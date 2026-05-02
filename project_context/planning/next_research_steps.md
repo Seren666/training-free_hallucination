@@ -16,20 +16,24 @@ Reason:
 
 ## 2. Priority Order
 
-### A. First: explain why the broad selective pilots failed
+### A. First: consolidate the new negative selective-pilot evidence
 
 Immediate priority:
 
 - treat `Object-Safe` and `Attention-Gated AttnAnchor` as informative negative results
+- treat `Candidate-Object Local Guard` as a narrower but still negative result
+- treat `Attention-Shape` as an offline-only route that did not justify generation
 - isolate what was still too broad in their runtime action
 - preserve the current mechanism claim boundary
 
 What this means concretely:
 
 - do not call the current attention gate a method win
+- do not call the current candidate-local guard a method win
 - do not expand either failed pilot to full scale
 - document the likely failure mode:
-  - broad object-token-id suppression still harms correct mentions
+  - broad or semi-broad object-token suppression still harms correct mentions
+  - diffuse attention-shape alone is not strong enough to define a good runtime rule
 
 ### B. Second: design a tighter object-local intervention
 
@@ -41,12 +45,18 @@ If method work continues:
 The next prototype should be narrower than:
 
 - all object-token ids on low-attention steps
+- or all strong object candidates in the current `top-k`
 
 The next prototype should be closer to:
 
 - candidate-token-local
 - phrase-aware
 - mention-local
+
+Likely implication from this round:
+
+- the next useful method probably has to reason over the specific object phrase or mention boundary
+- not just token-id membership plus a coarse score threshold
 
 ### C. Third: keep pilot discipline strict
 
@@ -62,6 +72,7 @@ Health criteria remain:
 - no substantial object-mention collapse
 - no correct-object collapse
 - no obvious regression in `CHAIRs / CHAIRi`
+- no object-mention drop beyond the explicit health threshold
 
 ## 3. Explicit De-Prioritization
 
@@ -106,10 +117,14 @@ Reason:
 ## 4. Current Recommended Sequence
 
 1. keep full fixed `first_logit` as the active baseline
-2. record both failed selective pilots clearly
-3. design a narrower object-local prototype only if it is materially different from broad object-token dampening
-4. use `1000` pilot gates before any new full COCO-CHAIR run
-5. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
+2. record the three negative selective results clearly:
+   - `object_safe_anchor`
+   - `attention_gated_attnanchor`
+   - `candidate_local_guard`
+3. record that `attention_shape_guard` currently stops at offline feasibility
+4. design a narrower object-local prototype only if it is materially different from broad or semi-broad object-token dampening
+5. use `1000` pilot gates before any new full COCO-CHAIR run
+6. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
 
 ## 5. Current Research Posture
 
@@ -118,5 +133,6 @@ Best current framing:
 - `first_logit / early-anchor` remains the strongest current decoding candidate
 - `COCO-CHAIR` remains the main positive benchmark
 - object-level evidence still supports an object-token-local mechanism story
-- but the current selective prototypes are not yet good enough to beat the fixed baseline
+- but the current selective prototypes are still not local enough to beat the fixed baseline
+- attention-shape signal seems real but not strong enough by itself for a runtime guard
 - future method work should become more local, not more global

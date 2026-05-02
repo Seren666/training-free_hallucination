@@ -112,24 +112,51 @@ Pilot takeaway:
 - removed hallucinations (`60`) do not outnumber introduced hallucinations (`69`)
 - the gate is narrower than flat object suppression, but still too broad at runtime
 
-## 9. Current Main Conclusions
+## 9. Candidate and Attention-Shape Follow-Up
 
-### 9.1 Benchmark split
+| Route | Stage | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Current Status |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| attention-shape | offline feasibility | object-local subset | - | - | - | - | - | stopped before generation; diffuse signal too weak |
+| candidate-local guard | 10 sanity | 10 | 0.3000 | 0.0909 | 49.5000 | 33 | 3 | implementation/runtime sanity only |
+| candidate-local guard | 1000 pilot | 1000 | 0.1680 | 0.0555 | 51.0600 | 4431 | 246 | healthier than previous attention-gated, but still worse than fixed `first_logit` |
+
+Follow-up takeaway:
+
+- offline feasibility favored `candidate_local_guard` over `attention_shape_guard`
+- `attention_shape_guard` was not run because:
+  - diffuse attention is somewhat more common in introduced hallucinations
+  - but separation from correct mentions is too weak for a direct pilot
+  - extremely concentrated attention is actually more common in correct mentions
+- `candidate_local_guard` was much narrower than previous attention-gated gating:
+  - about `10.938` gate-trigger steps per image vs about `44.315`
+- `candidate_local_guard` slightly improved over previous attention-gated:
+  - same `CHAIRs`
+  - better `CHAIRi`
+  - better object mentions
+  - fewer hallucinated objects
+- but it still does not beat fixed `first_logit`
+- and object mentions still drop by about `6.1%`, beyond the allowed health line
+
+## 10. Current Main Conclusions
+
+### 10.1 Benchmark split
 
 - `COCO-CHAIR` is now the main positive benchmark for `first_logit / early-anchor`
 - `POPE` is retained for one-forward signal audit, not for later-step first-logit intervention scoring
 - `AMBER` remains deferred
 
-### 9.2 Method status
+### 10.2 Method status
 
 - `first_logit / early-anchor` is a promising intervention candidate
 - it is not yet the final paper method
 - it should not yet be presented as a fully established final conclusion
 - the current `object_safe_anchor` pilot does not improve on fixed `first_logit`
 - the current `attention_gated_attnanchor` pilot also does not improve on fixed `first_logit`
+- the current `candidate_local_guard` pilot is the narrowest and healthiest selective follow-up so far, but still does not improve on fixed `first_logit`
+- the current `attention_shape_guard` route does not justify runtime generation yet
 - fixed `first_logit` remains the strongest decoding result so far
 
-### 9.3 Why the current COCO-CHAIR result matters
+### 10.3 Why the current COCO-CHAIR result matters
 
 - the effect remains positive from `100` to `500` to `1000` to `40504`
 - `CHAIRs` and `CHAIRi` both improve
@@ -140,14 +167,16 @@ Pilot takeaway:
 - near-official alignment preserves the same positive direction
 - object-level local signals now provide mechanism evidence
 
-### 9.4 What the failed follow-up pilots now imply
+### 10.4 What the failed follow-up pilots now imply
 
 - flat object-vocab positive-boost suppression is too coarse
 - step-level low-attention object-token gating is still too coarse in its current form
+- current top-k candidate-local gating is better, but still not local enough
+- diffuse attention-shape alone is not strong enough to justify a runtime guard
 - future selectivity has to move closer to the actual candidate object token or mention-local decision
 - a method can be more selective than `Object-Safe` and still fail if it suppresses too many valid object mentions
 
-### 9.5 What is no longer the main line
+### 10.5 What is no longer the main line
 
 - do not continue old `VCD / RAD-VCD` as the main paper line
 - do not keep tuning `POPE first_logit`
@@ -155,11 +184,13 @@ Pilot takeaway:
 - do not treat coarse image-level scalars as a viable selector
 - do not expand the current flat `object_safe_anchor` rule to full scale
 - do not expand the current `attention_gated_attnanchor` rule to full scale
+- do not expand the current `candidate_local_guard` rule to full scale
+- do not start `attention_shape_guard` generation from the current offline signal alone
 
-## 10. Current Recommended Next Step
+## 11. Current Recommended Next Step
 
 1. keep fixed `first_logit / early-anchor` as the best current decoding baseline
-2. use both negative pilots as evidence that broad object-token dampening is too coarse
-3. if method work continues, move to a tighter candidate-object or mention-local intervention
+2. treat `object_safe_anchor`, `attention_gated_attnanchor`, and `candidate_local_guard` as increasingly narrow but still negative selective pilots
+3. if method work continues, move to an even tighter candidate-object or mention-local intervention
 4. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
 5. do not immediately start parameter sweep, new benchmark expansion, or classifier work
