@@ -194,3 +194,23 @@ Follow-up takeaway:
 3. if method work continues, move to an even tighter candidate-object or mention-local intervention
 4. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
 5. do not immediately start parameter sweep, new benchmark expansion, or classifier work
+
+## 12. Dual-Trajectory Mention Selection Feasibility
+
+| Item | Result |
+|---|---|
+| route | caption-level selection between existing `regular` and fixed `first_logit` captions |
+| feasibility status | completed |
+| selected captions built | no |
+| stop point | stopped before full selection simulation |
+| why stopped | the critical `first_only hallucinated` vs `first_only correct` split shows only weak separation under the simple visual-support signals needed for rollback |
+| first-only probe subset counts | `first_only_hallucinated=1000`, `first_only_correct=63` |
+| first-only separation | `middle_image_attention_mean abs(AUC-0.5)=0.0465`, `hidden_image_cosine_middle_mean=0.0313`, `mention_position_ratio=0.0675`, `anchor_target_token_rank=0.1323` |
+| threshold source | unsupervised from existing 4000-event object-local probe |
+| runtime check | `20`-mention sanity probe succeeded; estimated full first-only probe cost was about `6` hours for `9378` mentions |
+
+Dual-trajectory takeaway:
+
+- caption-level rollback is cleaner than token-level suppression conceptually
+- but the actual rollback boundary, `first_logit-only hallucinated` vs `first_logit-only correct`, is too noisy under the current simple support signals
+- so this route currently stops at feasibility and does not replace fixed `first_logit`

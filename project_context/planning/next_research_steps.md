@@ -23,6 +23,7 @@ Immediate priority:
 - treat `Object-Safe` and `Attention-Gated AttnAnchor` as informative negative results
 - treat `Candidate-Object Local Guard` as a narrower but still negative result
 - treat `Attention-Shape` as an offline-only route that did not justify generation
+- treat simple caption-level `Dual-Trajectory Mention Selection` as a feasibility-only route that did not justify full selected-caption evaluation
 - isolate what was still too broad in their runtime action
 - preserve the current mechanism claim boundary
 
@@ -30,10 +31,12 @@ What this means concretely:
 
 - do not call the current attention gate a method win
 - do not call the current candidate-local guard a method win
+- do not call the current dual-trajectory caption-level fallback a method win
 - do not expand either failed pilot to full scale
 - document the likely failure mode:
   - broad or semi-broad object-token suppression still harms correct mentions
   - diffuse attention-shape alone is not strong enough to define a good runtime rule
+  - simple caption-level fallback is too coarse when the decisive `first_only` support signals are weak
 
 ### B. Second: design a tighter object-local intervention
 
@@ -52,11 +55,13 @@ The next prototype should be closer to:
 - candidate-token-local
 - phrase-aware
 - mention-local
+- mention-verified without whole-caption rollback
 
 Likely implication from this round:
 
 - the next useful method probably has to reason over the specific object phrase or mention boundary
 - not just token-id membership plus a coarse score threshold
+- if dual-trajectory is revisited, it should likely be phrase-level fusion or mention-level verification, not whole-caption fallback
 
 ### C. Third: keep pilot discipline strict
 
@@ -123,8 +128,9 @@ Reason:
    - `candidate_local_guard`
 3. record that `attention_shape_guard` currently stops at offline feasibility
 4. design a narrower object-local prototype only if it is materially different from broad or semi-broad object-token dampening
-5. use `1000` pilot gates before any new full COCO-CHAIR run
-6. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
+5. do not launch simple caption-level dual-trajectory rollback from the current weak-support signals
+6. use `1000` pilot gates before any new full COCO-CHAIR run
+7. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
 
 ## 5. Current Research Posture
 
@@ -135,4 +141,5 @@ Best current framing:
 - object-level evidence still supports an object-token-local mechanism story
 - but the current selective prototypes are still not local enough to beat the fixed baseline
 - attention-shape signal seems real but not strong enough by itself for a runtime guard
+- simple dual-trajectory caption-level fallback is cleaner in framing, but its `first_only` support boundary is too weak for rollout
 - future method work should become more local, not more global
