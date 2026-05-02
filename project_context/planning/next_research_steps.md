@@ -1,69 +1,81 @@
 # Next Research Steps
 
 > Date: 2026-05-02
-> Scope: near-term priority order after completed full COCO-CHAIR confirmation, evaluator alignment, image-level audit, and object-level mechanism analysis.
+> Scope: priority order after full COCO-CHAIR confirmation, evaluator alignment, completed mechanism analysis, the negative `Object-Safe` pilot, and the negative `Attention-Gated AttnAnchor` pilot.
 
-## 1. Priority Order
+## 1. Current Best Baseline
 
-### A. First: consolidate the mechanism story
+Current decoding baseline to keep fixed:
+
+- full `fixed first_logit / early-anchor`
+
+Reason:
+
+- it is still the strongest current COCO-CHAIR result
+- both follow-up selective pilots underperform it on the `1000` pilot
+
+## 2. Priority Order
+
+### A. First: explain why the broad selective pilots failed
 
 Immediate priority:
 
-- unify the current narrative across:
-  - full COCO-CHAIR positive result
-  - near-official evaluator alignment
-  - POPE null result
-  - image-level audit negative result
-  - object-level audit positive result
+- treat `Object-Safe` and `Attention-Gated AttnAnchor` as informative negative results
+- isolate what was still too broad in their runtime action
+- preserve the current mechanism claim boundary
 
-Why this comes first:
+What this means concretely:
 
-- the evidence is already strong enough to justify a mechanism-oriented story
-- the bigger current risk is overclaiming or fragmenting the interpretation
-- writing discipline is more valuable now than another experiment
+- do not call the current attention gate a method win
+- do not expand either failed pilot to full scale
+- document the likely failure mode:
+  - broad object-token-id suppression still harms correct mentions
 
-### B. Second: small evaluation alignment / cross-check work
+### B. Second: design a tighter object-local intervention
 
-After the mechanism story is clean:
+If method work continues:
 
-- tighten official or near-official evaluator confidence where feasible
-- allow only small cross-checks that do not reopen a large benchmark branch
+- move closer to the actual candidate object token or mention-local decision
+- avoid broad gating over a large object-token vocabulary on many late steps
 
-Examples of acceptable next validation:
+The next prototype should be narrower than:
 
-- official-style evaluator sanity where no new generation is needed
-- narrow consistency checks on already generated captions
+- all object-token ids on low-attention steps
 
-### C. Third: consider a selective early-anchor prototype
+The next prototype should be closer to:
 
-Only after the story and evaluation base are stable:
+- candidate-token-local
+- phrase-aware
+- mention-local
 
-- consider a very small object-local selective prototype
+### C. Third: keep pilot discipline strict
 
-If this happens, the starting signals should be:
+Before any new full run:
 
-- `mention_position_ratio`
-- `anchor_target_token_rank`
-- `adjusted_target_rank_if_applied`
-- possibly `anchor_weight_at_object_step`
+- require a `1000` pilot first
+- only allow full expansion if the pilot beats fixed `first_logit` or shows a clearly better tradeoff
 
-Important boundary:
+Health criteria remain:
 
-- this would be a controlled prototype, not an immediate full method branch
+- no first-word change
+- no empty captions
+- no substantial object-mention collapse
+- no correct-object collapse
+- no obvious regression in `CHAIRs / CHAIRi`
 
-## 2. Explicit De-Prioritization
+## 3. Explicit De-Prioritization
 
 ### D. Do not do parameter sweep now
 
 Not now:
 
 - no `gamma / lambda / cd_beta` sweep
-- no benchmark chasing
+- no threshold sweep
 - no score tuning
 
 Reason:
 
-- current uncertainty is mechanistic, not mainly hyperparameter uncertainty
+- the main problem is method shape, not parameter selection
 
 ### E. Do not start a new benchmark line now
 
@@ -75,8 +87,8 @@ Not now:
 
 Reason:
 
-- the current evidence is already rich enough on COCO-CHAIR
-- adding new benchmark surface area now would dilute the mechanism story
+- the current uncertainty is inside the decoding rule itself
+- new benchmark surface area would not resolve that
 
 ### F. Do not build a classifier now
 
@@ -84,26 +96,27 @@ Not now:
 
 - no classifier training
 - no threshold search
-- no heavy routing policy work
+- no heavy routing policy
 
 Reason:
 
-- image-level signals were weak
-- object-level signals are promising, but not yet mature enough for a final selector claim
+- image-level selectors already failed
+- the current selective problem is still at the runtime intervention-definition level
 
-## 3. Current Recommended Sequence
+## 4. Current Recommended Sequence
 
-1. finalize mechanism-oriented writing
-2. preserve the claim boundary clearly
-3. do only small evaluation-alignment or consistency cross-checks if needed
-4. if momentum remains strong, design a very small object-local selective prototype later
+1. keep full fixed `first_logit` as the active baseline
+2. record both failed selective pilots clearly
+3. design a narrower object-local prototype only if it is materially different from broad object-token dampening
+4. use `1000` pilot gates before any new full COCO-CHAIR run
+5. avoid parameter sweep, classifier work, and benchmark expansion until a better pilot exists
 
-## 4. Current Research Posture
+## 5. Current Research Posture
 
 Best current framing:
 
-- `first_logit / early-anchor` is the strongest current mechanism candidate
-- COCO-CHAIR is the main positive result line
-- POPE is retained for answer-boundary signal audit
-- coarse image-level selective gating is not supported
-- future selectivity, if any, should be object-token-level rather than image-level
+- `first_logit / early-anchor` remains the strongest current decoding candidate
+- `COCO-CHAIR` remains the main positive benchmark
+- object-level evidence still supports an object-token-local mechanism story
+- but the current selective prototypes are not yet good enough to beat the fixed baseline
+- future method work should become more local, not more global

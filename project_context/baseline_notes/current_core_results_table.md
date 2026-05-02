@@ -92,22 +92,44 @@ Pilot takeaway:
 - correct object mentions drop by `473`
 - so the current flat object-token positive-boost scaling is too blunt
 
-## 8. Current Main Conclusions
+## 8. Attention-Gated Early Anchor Pilot
 
-### 8.1 Benchmark split
+| Stage | Images | CHAIRs | CHAIRi | Avg Caption Length | Object Mentions | Hallucinated Object Count | Current Status |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 10 sanity | 10 | 0.3000 | 0.0811 | 49.8000 | 37 | 3 | implementation/runtime sanity only; too small for method judgment |
+| 1000 pilot | 1000 | 0.1680 | 0.0575 | 51.1140 | 4329 | 249 | did not beat fixed `first_logit`; stopped before full |
+
+Pilot takeaway:
+
+- the offline gate idea looked better than flat `Object-Safe`
+- first word changed remains `0`
+- empty captions remain `0`
+- but the `1000` pilot still underperforms fixed `first_logit`
+- `CHAIRs` and `CHAIRi` are both worse than fixed `first_logit`
+- hallucinated object count is also worse than fixed `first_logit`
+- object mentions drop by `388`
+- correct object mentions drop by `397`
+- removed hallucinations (`60`) do not outnumber introduced hallucinations (`69`)
+- the gate is narrower than flat object suppression, but still too broad at runtime
+
+## 9. Current Main Conclusions
+
+### 9.1 Benchmark split
 
 - `COCO-CHAIR` is now the main positive benchmark for `first_logit / early-anchor`
 - `POPE` is retained for one-forward signal audit, not for later-step first-logit intervention scoring
 - `AMBER` remains deferred
 
-### 8.2 Method status
+### 9.2 Method status
 
 - `first_logit / early-anchor` is a promising intervention candidate
 - it is not yet the final paper method
 - it should not yet be presented as a fully established final conclusion
-- the current `object_safe_anchor` pilot does not yet improve on fixed `first_logit`
+- the current `object_safe_anchor` pilot does not improve on fixed `first_logit`
+- the current `attention_gated_attnanchor` pilot also does not improve on fixed `first_logit`
+- fixed `first_logit` remains the strongest decoding result so far
 
-### 8.3 Why the current COCO-CHAIR result matters
+### 9.3 Why the current COCO-CHAIR result matters
 
 - the effect remains positive from `100` to `500` to `1000` to `40504`
 - `CHAIRs` and `CHAIRi` both improve
@@ -118,17 +140,26 @@ Pilot takeaway:
 - near-official alignment preserves the same positive direction
 - object-level local signals now provide mechanism evidence
 
-### 8.4 What is no longer the main line
+### 9.4 What the failed follow-up pilots now imply
+
+- flat object-vocab positive-boost suppression is too coarse
+- step-level low-attention object-token gating is still too coarse in its current form
+- future selectivity has to move closer to the actual candidate object token or mention-local decision
+- a method can be more selective than `Object-Safe` and still fail if it suppresses too many valid object mentions
+
+### 9.5 What is no longer the main line
 
 - do not continue old `VCD / RAD-VCD` as the main paper line
 - do not keep tuning `POPE first_logit`
 - do not use `The effect` as the main explanation path
 - do not treat coarse image-level scalars as a viable selector
 - do not expand the current flat `object_safe_anchor` rule to full scale
+- do not expand the current `attention_gated_attnanchor` rule to full scale
 
-## 9. Current Recommended Next Step
+## 10. Current Recommended Next Step
 
-1. use the negative `object_safe_anchor` pilot as evidence that flat object-token dampening is too coarse
-2. keep mechanism design focused on object-local selectivity rather than global object suppression
-3. only later consider a tighter object-local selective prototype
-4. do not immediately start parameter sweep, new benchmark expansion, or classifier work
+1. keep fixed `first_logit / early-anchor` as the best current decoding baseline
+2. use both negative pilots as evidence that broad object-token dampening is too coarse
+3. if method work continues, move to a tighter candidate-object or mention-local intervention
+4. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot
+5. do not immediately start parameter sweep, new benchmark expansion, or classifier work
