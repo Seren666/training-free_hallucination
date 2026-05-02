@@ -1,64 +1,76 @@
 # Next Research Steps
 
 > Date: 2026-05-02
-> Scope: next-stage priorities after full COCO-CHAIR confirmation, near-official alignment, middle-layer mechanism audit, and the completed negative guard-family follow-ups.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, stopping the guard family, and completing the first attention-distribution / visual-sensitivity audits.
 
-## 1. Current Baseline To Keep Fixed
+## 1. Current Reference To Keep Fixed
 
-Active main method candidate:
+Keep fixed:
 
 - full `fixed first_logit / early-anchor`
 
-Why:
+Role:
 
-- it remains the strongest current COCO-CHAIR result
-- no guard-family follow-up has beaten it on the `1000` pilot
-- its positive full-result story already has evaluator-alignment and mechanism support
+- strongest current decoding baseline
+- main method candidate
+- reference trajectory for all future signal audits
+
+What not to do with it now:
+
+- no more threshold tuning around failed guards
+- no more token-level clipping follow-ups
+- no more broad object-suppression or anchor-cleaning variants
 
 ## 2. Priority Order
 
-### A. First: solidify Early-Anchor Decoding
+### A. First: continue internal hallucination signal discovery
 
 Immediate focus:
 
-- lock fixed `first_logit / early-anchor` as the current main method candidate
-- consolidate the positive result story across:
-  - full COCO-CHAIR
-  - near-official evaluator alignment
-  - POPE protocol interpretation
-  - object-level and middle-layer mechanism evidence
-- make the negative guard-family results explicit so they stop competing for the main line
+- treat this round's attention-distribution audit as the new active research line
+- keep looking for internal signals that separate hallucinated vs correct object mentions without immediately turning them into a decoding rule
 
-### B. Second: do external baseline alignment
+Current strongest families to build on:
 
-Next validation focus:
+- middle image-attention mass
+- middle-to-late attention-mass change
+- anchor-plus-verification interaction
+- controlled visual sensitivity with random-mask comparison
 
-- align the current main result against stronger external or published baseline surfaces where feasible
-- improve confidence that the current gain is meaningful beyond the internal regular-vs-first-logit comparison
-- keep this as validation work, not a new method-search branch
+Signals to de-prioritize as standalone rules:
 
-### C. Third: do stability and cross-setting validation
+- diffuse entropy alone
+- pure concentration alone
+- another broad guard based on low attention or object-token membership
 
-Next empirical focus:
+### B. Second: validate signal stability before designing correction
 
-- test whether the fixed early-anchor result remains stable across nearby settings
-- prioritize robustness checks over inventing another suppression rule
-- keep pilot discipline strict:
-  - require `1000`-image checks before any new full expansion
-  - require no first-word drift
-  - require no empty captions
-  - require no object-mention or correct-object collapse
+Next measurement focus:
 
-### D. Fourth: pause token-level guard and object-suppression work
+- check whether the best signals remain stable when the event subset grows or changes
+- compare the same signals across event types instead of only `introduced vs correct`
+- keep measurement first and method design second
 
-Stop here:
+The practical question is:
 
-- no more token-level boost clipping variants
-- no more broad object-suppression variants
-- no more broad anchor-cleaning guard variants
-- no threshold sweep for the failed guard family
+- which signals keep ranking near the top when the subset, object mix, or control design changes
 
-Why:
+### C. Third: keep early-anchor as the fixed decoding reference, not the optimization target
+
+Near-term posture:
+
+- keep fixed `first_logit / early-anchor` as the reference decoding trajectory
+- use it to define paired object-event audits
+- do not resume active method tweaking around it until the signal story is clearly stronger
+
+This means:
+
+- early-anchor stays fixed
+- the research surface moves to internal measurement
+
+### D. Fourth: keep the failed guard family paused
+
+Stay paused:
 
 - `object_safe_anchor`
 - `attention_gated_attnanchor`
@@ -66,29 +78,43 @@ Why:
 - `middle_verified`
 - `middle_refined`
 
-all fail to beat fixed `first_logit`, and the shared failure mode is still object-mention and correct-object collapse.
+Why:
 
-### E. Fifth: only revisit new selective methods with stronger mechanism grounding
+- none beat fixed `first_logit`
+- the recurring cost remained object-mention or correct-object collapse
+- the new attention-distribution audit does not justify returning to that family
 
-If method work resumes later:
+### E. Fifth: only resume correction-method design when the signal side is stronger
 
-- only consider trajectory-level or phrase-level ideas if there is fresh mechanism evidence that clearly justifies them
-- prefer a genuinely different unit of action over another broad suppression rule
-- do not resume guard-family expansion by default
+Only resume method design if a future signal family clearly beats the current weak heuristics.
+
+That means:
+
+- a signal should outperform simple diffuse entropy
+- it should remain competitive against middle attention mass and mass-evolution signals
+- it should have a plausible correction interface that is narrower than the failed guard family
+
+Likely acceptable future directions, if justified later:
+
+- mention-level verification
+- candidate-level verification with stronger causal support
+- phrase-level or trajectory-level methods only if the measurement story becomes much cleaner
 
 ## 3. Explicit Pauses
 
 Not now:
 
-- no `gamma / lambda / cd_beta` sweep
+- no new token-level clipping variant
+- no broad object suppression
+- no broad anchor cleaning
 - no threshold search
 - no classifier training
-- no new benchmark branch such as POPE / AMBER / MME expansion for this method question
-- no continuation of the current token-level guard family
+- no new benchmark branch for this question
+- no attempt to turn weak entropy-only effects into a runtime controller
 
 ## 4. Current Recommendation
 
-1. keep full fixed `first_logit / early-anchor` as the active main baseline and main method candidate
-2. consolidate all failed guard-family results into one clear negative evidence chain
-3. spend the next cycle on result solidification, external alignment, and stability checks
-4. only revisit new selective methods if the next mechanism evidence clearly supports a different, more local action unit
+1. keep fixed `first_logit / early-anchor` as the locked decoding reference
+2. treat internal hallucination signal discovery as the main active research thread
+3. prioritize middle-attention mass, mass-evolution, and controlled visual sensitivity over diffuse-entropy heuristics
+4. only return to correction methods when the signal side is clearly strong enough to justify a new action unit

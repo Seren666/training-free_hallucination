@@ -311,4 +311,33 @@ Comparison takeaway:
 - treat fixed `first_logit / early-anchor` as the current main method candidate
 - treat `object_safe_anchor`, `attention_gated_attnanchor`, `candidate_local_guard`, `middle_verified`, and `middle_refined` as informative negative follow-ups
 - do not continue token-level boost clipping, broad object suppression, or broad anchor-cleaning guard expansion
-- next work should focus on validating the main early-anchor result rather than searching for another guard variant in the same family
+- next work should focus on validating the main early-anchor result and discovering stronger internal hallucination signals rather than searching for another guard variant in the same family
+
+## 18. Attention Distribution Hallucination Audit
+
+| Audit | Scope | Main Result | Current Conclusion |
+|---|---|---|---|
+| attention-shape probe | frozen balanced subset, `1982` events total: `correct=496`, `introduced=496`, `removed=495`, `persistent=495` | strongest `introduced vs correct` separator is `mass_change_late_minus_mid` with `abs(AUC-0.5)=0.3223`; next is `middle_image_attention_mean` with `0.2761`; diffuse entropy alone is weak at `0.0795` | middle-to-late attention evolution is more informative than simple diffuse-attention heuristics |
+| visual sensitivity probe | balanced subset, `800` events total: `200` per event type | correct mentions are more sensitive to top-attention patch masking than introduced hallucinations, but best sensitivity signal (`sensitivity_ratio_prob`, `0.1110`) is still weaker than the best shape / mass signals | attention-guided masking is useful supporting evidence, but not yet the dominant separator |
+
+Attention-distribution takeaway:
+
+- hallucinated mentions do tend to have weaker middle visual support
+- they are also somewhat more diffuse, but diffuse entropy is not the main story
+- extreme concentration is not automatically a "correct grounding" signal; in this audit it leans more hallucination-like
+- head consistency helps somewhat, but middle-to-late mass change is stronger than pure head-overlap heuristics
+- current best signal family is:
+  - middle image attention mass
+  - middle-to-late mass evolution
+  - anchor-plus-verification interaction
+
+## 19. Current Research Shift
+
+- fixed `first_logit / early-anchor` remains the decoding reference and main method candidate
+- the active exploration line has now shifted away from new clipping / suppression variants
+- the current question is no longer "what guard should be added"
+- the current question is "what internal signal actually tracks hallucination reliably"
+- present evidence says:
+  - middle-layer verification matters
+  - layer-evolution signals matter more than diffuse entropy alone
+  - attention-guided visual sensitivity is informative, but not yet stronger than the best attention mass / evolution signals
