@@ -341,3 +341,53 @@ Attention-distribution takeaway:
   - middle-layer verification matters
   - layer-evolution signals matter more than diffuse entropy alone
   - attention-guided visual sensitivity is informative, but not yet stronger than the best attention mass / evolution signals
+
+## 20. Early-Anchor Internal Signal Audit
+
+| Audit | Scope | Main Result | Current Conclusion |
+|---|---|---|---|
+| paired regular-vs-early-anchor internal audit | current frozen shape subset (`1982`) plus alternate shared-trajectory shape subset (`905`); current sensitivity subset (`800`) plus alternate shared-trajectory sensitivity subset (`372`) | the strongest `introduced_first_logit_only vs correct_first_logit` signals are still middle-to-late verification-evolution terms, not shared-event trajectory deltas | within-trajectory verification quality is informative; shared-event `regular -> first_logit` internal shifts are small, so no runtime correction rule is justified yet |
+
+Internal-audit takeaway:
+
+- strongest `introduced_first_logit_only vs correct_first_logit` separators:
+  - `middle_x_mass_change`: `abs(AUC-0.5)=0.3612`
+  - `mass_change_late_minus_mid`: `0.3541`
+  - `middle_to_late_image_attention_delta`: `0.3541`
+  - `firstlogitgap_x_verification_masschange`: `0.3319`
+  - `anchor_masschange_x_late_mass`: `0.3123`
+  - `late_image_attention_recovery_ratio`: `0.2996`
+  - `middle_image_attention_mean`: `0.2858`
+- those signals beat pure sensitivity and clearly beat pure entropy-style heuristics
+- but true shared-event paired deltas are weak:
+  - best `persistent vs correct` paired delta from the shape side is only `anchor_masschange_x_late_mass` at `0.0461`
+  - best paired sensitivity delta is `sensitivity_ratio_prob` at `0.0502`
+- paired group means show that early-anchor changes shared-event middle attention and mass evolution only slightly:
+  - correct middle attention mean: `0.1899 -> 0.1878`
+  - persistent middle attention mean: `0.1634 -> 0.1606`
+  - correct mass change: `-0.0620 -> -0.0616`
+  - persistent mass change: `-0.0372 -> -0.0357`
+- control-aware sensitivity keeps the right direction, but remains secondary:
+  - `top_minus_random_logit_drop`: introduced `0.2458` vs correct `1.0550`
+  - within every middle-attention-mass bin, correct still exceeds introduced, but with small `abs(AUC-0.5)` values
+  - within every mention-length group, correct still exceeds introduced, but again weakly
+
+Current implication:
+
+- the best current signal family is still:
+  - middle verification mass
+  - middle-to-late verification evolution
+  - anchor-plus-verification interaction
+- these are now better supported as correction-facing signal candidates than pure entropy, concentration, or raw sensitivity
+- but they are not yet strong as direct shared-event trajectory-delta controls
+- the safe next move is still more signal consolidation, not a new decoding intervention
+
+Current correction-facing candidates:
+
+- `mass_change_late_minus_mid`
+- `middle_to_late_image_attention_delta`
+- `middle_x_mass_change`
+- `firstlogitgap_x_verification_masschange`
+- `anchor_masschange_x_late_mass`
+- `late_image_attention_recovery_ratio`
+- `middle_image_attention_mean`
