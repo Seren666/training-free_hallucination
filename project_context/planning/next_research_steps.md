@@ -300,3 +300,43 @@ What stays fixed:
 - no Codex-initiated correction redesign without user confirmation
 - training-free weighted verification remains the main evidence source
 - classifier remains backup only
+
+## 6. After Expanded `5000`-Image Confirmation
+
+Current status:
+
+- the direct full run is still blocked by missing full weighted mention-risk tables
+- expanded confirmation on `5000` images is now completed for both retained correction branches
+- near-official subset alignment is also completed and preserves the same branch ordering
+
+What the expanded result now supports:
+
+- `firstlogit_removal_top10` should remain the metric-strong aggressive candidate
+- `dual_phrase_replace_v1` should remain the quality-preserving phrase-level candidate
+- both branches should stay alive for discussion
+- Codex should not auto-prune one branch based only on the current tradeoff
+
+What it still does **not** support:
+
+- no automatic full `40504`-image extraction run
+- no new correction family
+- no new decoding or reranking line
+- no classifier-led correction pivot
+
+Current recommended discussion boundary:
+
+1. if the user wants stronger confirmation, the next acceptable run is a user-approved full comparison of:
+   - `firstlogit_removal_top10`
+   - `dual_phrase_replace_v1`
+2. if the user prefers paper-positioning first, the current `5000`-image expanded result is already strong enough to discuss:
+   - metric-strong branch
+   - quality-preserving branch
+   - preservation vs aggressiveness tradeoff
+3. if neither is approved, stop at the current expanded result and do not let Codex invent a new method line
+
+What stays fixed after expansion:
+
+- weighted training-free verifier remains the primary evidence source
+- classifier remains backup / diagnostic only
+- no full confirmation without user approval
+- no Codex-initiated correction redesign

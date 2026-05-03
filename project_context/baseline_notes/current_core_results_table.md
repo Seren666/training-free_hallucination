@@ -701,3 +701,63 @@ Current boundary update:
   - optional `caption_level_fallback_diagnostic` only as a preservation reference
 - weighted training-free verification remains the main evidence source
 - classifier remains backup only
+
+## 29. Expanded Correction Confirmation
+
+| Item | Result |
+|---|---|
+| full weighted risk table already available | no |
+| readiness decision | direct full rejected; `5000`-image expanded confirmation completed |
+| reason not full | full weighted risk extraction still missing and estimated at about `25.7 h` probe-only |
+| expanded probe estimate used for decision | `5000` about `3.24 h`, `10000` about `6.49 h` |
+| expanded fixed-source risk pool | `10446` mention rows across `4901` images |
+| expanded verifier top `10%` precision / recall | `0.3206 / 0.3394` |
+| first-logit-only top `10%` precision | `0.4565` |
+| common-mention top `10%` precision | `0.2091` |
+| best raw expanded branch | `firstlogit_removal_top10` |
+| best preservation expanded branch | `dual_phrase_replace_v1` |
+| near-official subset alignment | completed on the same `5000` images |
+
+Expanded `5000`-image metrics:
+
+| Method | CHAIRs | CHAIRi | Object Mentions | Correct Object Count | Hallucinated Object Count | Correct Delta vs fixed | Hallucinated Delta vs fixed |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `regular` | `0.2050` | `0.0662` | `22502` | `21013` | `1489` | `-1137` | `+251` |
+| fixed `first_logit` | `0.1648` | `0.0529` | `23388` | `22150` | `1238` | `0` | `0` |
+| `firstlogit_removal_top10` | `0.1344` | `0.0435` | `22715` | `21726` | `989` | `-424` | `-249` |
+| `dual_phrase_replace_v1` | `0.1456` | `0.0468` | `23016` | `21939` | `1077` | `-211` | `-161` |
+
+Risk-benefit reading:
+
+- raw CHAIR keeps improving through top `20%` for both action families
+- top `20%` is more aggressive and should stay diagnostic-only
+- top `10%` remains the clean preregistered default slice
+- preservation ratio is healthier for `dual_phrase_replace_v1` at every slice
+
+Quality reading:
+
+- `firstlogit_removal_top10`
+  - strongest raw score
+  - grammar/coherence issue rate about `3.76%`
+  - clear local deletion artifacts and heavier correct-object loss
+- `dual_phrase_replace_v1`
+  - grammar/coherence issue rate about `0.81%`
+  - lower correct-object loss
+  - real phrase replacement exists, but many edits are still removals
+
+Near-official `5000`-subset alignment:
+
+| Method | CHAIRs | CHAIRi | Object Mentions | Hallucinated Objects |
+|---|---:|---:|---:|---:|
+| `regular_subset` | `0.2038` | `0.0682` | `21460` | `1463` |
+| `fixed_first_logit_subset` | `0.1620` | `0.0543` | `22270` | `1209` |
+| `firstlogit_removal_top10` | `0.1318` | `0.0448` | `21631` | `970` |
+| `dual_phrase_replace_v1` | `0.1430` | `0.0482` | `21920` | `1056` |
+
+Expanded-confirmation takeaway:
+
+- both correction branches remain positive at `5000` images
+- `firstlogit_removal_top10` remains the metric-strong aggressive branch
+- `dual_phrase_replace_v1` remains the cleaner preservation branch
+- the current evidence is strong enough for a user-approved full-confirmation or paper-positioning discussion
+- it is still not permission for Codex to auto-start full extraction or auto-eliminate one branch
