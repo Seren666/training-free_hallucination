@@ -467,3 +467,51 @@ Current boundary:
   - layer-anchor replacement
   - runtime mismatch triggering
 - only discuss correction again if the evidence story becomes stable enough and the user explicitly wants to turn it into a method
+
+## 24. Mention-Level Verification Audit
+
+| Item | Result |
+|---|---|
+| dataset | reused existing balanced `4000`-event object-local audit subset |
+| classes | `1000` each for `correct`, `introduced`, `removed`, `persistent` |
+| caption source | `regular=2937`, `first_logit=1063` |
+| sensitivity coverage | only the existing `800`-event sensitivity subset, so sensitivity-family missing rate remains high |
+| primary task | `hallucinated object mention` vs `correct object mention` |
+| strongest single signal | `middle_x_mass_change`, `abs(AUC-0.5)=0.2745` on `hallucinated_vs_correct` |
+| next strongest single signals | `mass_change_late_minus_mid=0.2701`, `middle_to_late_image_attention_delta=0.2701`, `anchor_masschange_x_late_mass=0.2514`, `image_attention_middle_mean=0.2155` |
+| best composite on primary task | `composite_middle_to_late_abnormal_evolution=0.2684` |
+| composite vs best single | composite helps summarize evidence, but does **not** beat the best single signal |
+| introduced vs correct | best single `middle_x_mass_change=0.3198`; best composite `middle_to_late_abnormal_evolution=0.3091` |
+| removed vs correct | strongest current slice: `middle_x_mass_change=0.3252`, `mass_change_late_minus_mid=0.3233` |
+| persistent vs correct | weaker and harder: best direction-consistent signals around `0.175` to `0.179` |
+| control robustness | top evolution / mismatch / middle-verification signals stay strong across category, position, mention-length, and frequency controls |
+| first-logit-side caption-source control | weaker because only `63` first-logit-side correct events are available, but direction mostly survives |
+
+Mention-level verification takeaway:
+
+- mention-level verification is now supported at a diagnostic level
+- the strongest current families are:
+  - middle-to-late evolution
+  - anchor-middle mismatch
+  - middle visual verification
+- attention shape / head agreement and visual sensitivity remain supporting validation, not the main verification core
+- diffuse attention, pure concentration, and raw late confidence are still too weak or too unstable as standalone mention-level rules
+
+Current best mention-level verification candidates:
+
+- `middle_x_mass_change`
+- `mass_change_late_minus_mid`
+- `middle_to_late_image_attention_delta`
+- `composite_middle_to_late_abnormal_evolution`
+- `anchor_masschange_x_late_mass`
+- `composite_combined_evidence_consistency`
+- `late_image_attention_recovery_ratio`
+- `image_attention_middle_mean`
+- `composite_middle_verification_deficit`
+- `composite_anchor_middle_mismatch`
+
+Current boundary:
+
+- this is enough to support a future second-pass correction **discussion**
+- it is **not** enough to justify implementing a correction method yet
+- Codex should not jump from this audit directly into second-pass correction without user approval

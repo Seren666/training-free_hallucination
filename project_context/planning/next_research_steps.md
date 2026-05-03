@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference and formally switching the active branch from local method tweaking to hallucination evidence discovery.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, and finishing the first mention-level verification audit.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -32,6 +32,7 @@ Immediate focus:
 - treat `first_logit`-side object-local middle verification as the main positive signal surface
 - treat middle-to-late attention evolution as the strongest current evidence family
 - treat anchor-middle mismatch interaction as the strongest first-logit-side mismatch family
+- treat mention-level verification as now feasible at a diagnostic level
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
 - treat the new layer-wise anchor result as a useful negative method result:
   - late-layer ensemble anchors can look cleaner offline
@@ -56,6 +57,9 @@ Current evidence status after the hypothesis audit:
   - middle-to-late attention evolution
   - anchor-middle mismatch
   - removed / persistent / introduced are not identical failure paths
+- now additionally supported at mention level:
+  - hallucinated object mentions can be distinguished from correct mentions above chance
+  - the best mention-level candidates are still evolution + mismatch + middle-verification signals
 - weak but still useful:
   - late readiness surge as a relative rank-jump story
   - diffuse attention
@@ -90,12 +94,17 @@ Next measurement focus:
   - supporting validation evidence
   - correction-facing candidate evidence
   - insufficient runtime rule
+- keep the mention-level verification framing:
+  - diagnostic verification only
+  - not a runtime selector
+  - not a correction method yet
 - keep measurement first and method design second
 
 The practical question is:
 
 - which signals keep ranking near the top when the subset, object mix, control design, and pairing setup change
 - and whether they remain strongest on the `first_logit`-side `introduced vs correct` split rather than only on weak paired deltas
+- and whether the mention-level verification story is strong enough to justify a user-approved second-pass correction design discussion
 
 ### C. Third: keep early-anchor as the fixed decoding reference, not the optimization target
 
@@ -111,6 +120,7 @@ This means:
 - the research surface moves to internal measurement
 - layer-wise anchor signals can still be audited, but not promoted to a new default decoding anchor yet
 - no new correction method should start without a fresh user-approved design discussion
+- fixed `first_logit` remains the strongest generation baseline, but it is no longer the only active research target
 
 ### D. Fourth: keep the failed guard family paused
 
@@ -148,6 +158,7 @@ Likely acceptable future directions, if justified later:
 - first-logit-side object-local middle verification
 - middle-to-late attention evolution with stronger causal support
 - anchor-middle mismatch with better control evidence
+- mention-level verification as a second-pass design surface, but only after user approval
 - layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
 - phrase-level or trajectory-level methods only if the method boundary becomes much cleaner than the current shared-delta story
@@ -167,18 +178,21 @@ Not now:
 - no immediate second round of layer-anchor replacement tuning
 - no immediate mismatch-trigger runtime implementation
 - no automatic jump from evidence discovery to correction design
+- no automatic jump from mention-level verification to second-pass correction implementation
 
 ## 4. Current Recommendation
 
 1. keep fixed `first_logit / early-anchor` as the locked decoding reference
 2. treat internal hallucination signal discovery as the main active research thread
-3. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
-4. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
-5. do not turn the current weak shared-event trajectory deltas into a runtime controller
-6. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
-7. do not turn the current mismatch signals into a runtime controller yet
-8. if methods are revisited later, center them on the strongest supported families:
+3. treat mention-level verification as the current highest-value narrowing step between mechanism story and any future correction discussion
+4. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
+5. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
+6. do not turn the current weak shared-event trajectory deltas into a runtime controller
+7. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
+8. do not turn the current mismatch signals into a runtime controller yet
+9. if methods are revisited later, center them on the strongest supported families:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-9. do not start any new correction method without explicit user discussion and approval first
+10. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion**, not an implementation jump
+11. do not start any new correction method without explicit user discussion and approval first
