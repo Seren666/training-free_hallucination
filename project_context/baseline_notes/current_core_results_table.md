@@ -409,3 +409,61 @@ Layer-wise takeaway:
 - offline support separation can improve while caption-time CHAIR still gets worse
 - always-on layer-anchor replacement therefore does not currently beat fixed `first_logit`
 - middle-late mismatch should remain an analysis signal, not a runtime method in the current state
+
+## 22. Hallucination Evidence Hypothesis Audit
+
+| Hypothesis | Status | Strongest Current Signal | Main Result | Current Interpretation |
+|---|---|---|---|---|
+| `H1` Middle Verification Deficit | supported | `image_attention_middle_mean` | introduced vs correct: `0.1451` vs `0.1835`, `abs(AUC-0.5)=0.2616` | hallucinated mentions are already weaker in middle visual verification |
+| `H2` Late Readiness Surge | weak | `middle_to_late_rank_improvement` | introduced vs correct: `5584.0` vs `3486.0`, `0.1158` | only relative rank-jump support remains; absolute late confidence does not support the claim |
+| `H3` Middle-to-Late Attention Evolution | supported | `middle_x_mass_change` | introduced vs correct: `-0.0028` vs `-0.0108`, `0.3333` | strongest overall signal family |
+| `H4` Attention Diffusion | weak | `middle_effective_attended_count_mean` | introduced vs correct: `162.0` vs `149.9`, `0.0833` | diffuse attention is real but too weak as a main rule |
+| `H5` Extreme Concentration / Spurious Fixation | weak | `middle_top1_mass_mean` | hallucinated vs correct: `0.0725` vs `0.0694`, `0.0749` | concentration alone is not grounding and not a stable hallucination flag |
+| `H6` Head Agreement | weak | `middle_head_mass_cv_mean` | introduced vs correct: `1.1869` vs `1.1397`, `0.1469` | useful supporting evidence, weaker than verification-evolution signals |
+| `H7` Layer Consistency | weak | `late_shape_layer_cosine_mean` | introduced vs correct: `0.6713` vs `0.6900`, `0.1214` | cross-layer mismatch exists, but not strongly enough alone |
+| `H8` Anchor-Middle Mismatch | supported | `anchor_masschange_x_late_mass` | introduced vs correct: `-0.0021` vs `-0.0053`, `0.2749` | strong first-logit-side mismatch story |
+| `H9` Visual Sensitivity Validation | weak | `sensitivity_ratio_prob` | introduced vs correct: `-0.3293` vs `28.3352`, `0.1110` | supporting validation signal, not the main separator |
+| `H10` Removed vs Introduced Difference | supported | `mass_change_late_minus_mid` | removed vs persistent: `-0.0175` vs `-0.0372`, `0.2159` | removed / persistent / introduced are not identical trajectories |
+
+Evidence-discovery takeaway:
+
+- strongest supported families:
+  - middle verification
+  - middle-to-late attention evolution
+  - anchor-middle mismatch interaction
+- weak but useful supporting families:
+  - head agreement
+  - layer consistency
+  - attention-guided visual sensitivity
+- weak standalone families:
+  - diffuse entropy alone
+  - pure concentration alone
+
+Current best correction-facing evidence candidates:
+
+- `middle_x_mass_change`
+- `mass_change_late_minus_mid`
+- `middle_to_late_image_attention_delta`
+- `anchor_masschange_x_late_mass`
+- `image_attention_middle_mean`
+- `firstlogitgap_x_verification_masschange`
+- `middle_target_probability_mean`
+- `obj_semantic_refinement_19_26_target_rank_mean`
+
+Current boundary:
+
+- the audit supports stronger mechanism claims
+- it does **not** yet support a runtime rule, selector, or new decoding intervention
+- method design should stay paused until the user explicitly approves a new correction-design round
+
+## 23. Current Research Posture
+
+- fixed `first_logit / early-anchor` remains the strongest decoding reference and main method candidate
+- the active branch is now hallucination evidence discovery, not local first-logit optimization
+- do not continue:
+  - token-level clipping
+  - object suppression
+  - anchor cleaning
+  - layer-anchor replacement
+  - runtime mismatch triggering
+- only discuss correction again if the evidence story becomes stable enough and the user explicitly wants to turn it into a method

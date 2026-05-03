@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, stopping the guard family, completing the internal-signal audits, and testing the first layer-wise anchor replacement route.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference and formally switching the active branch from local method tweaking to hallucination evidence discovery.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -30,6 +30,8 @@ Immediate focus:
 - consolidate the finished internal-signal audits into a stable mechanism story
 - keep the internal-signal line active, but do not jump from descriptive evidence to a runtime selector
 - treat `first_logit`-side object-local middle verification as the main positive signal surface
+- treat middle-to-late attention evolution as the strongest current evidence family
+- treat anchor-middle mismatch interaction as the strongest first-logit-side mismatch family
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
 - treat the new layer-wise anchor result as a useful negative method result:
   - late-layer ensemble anchors can look cleaner offline
@@ -39,12 +41,31 @@ Current strongest families to build on:
 
 - middle image-attention mass
 - middle-to-late attention-mass change
+- middle-x-mass-change interaction
 - anchor-plus-verification interaction
 - controlled visual sensitivity with random-mask comparison
 - first-logit-gap x verification-evolution interaction
 - layer-group comparisons as a descriptive audit surface, especially:
   - `late_27_31` target-logit support
   - shallow / early-middle image-attention mass
+
+Current evidence status after the hypothesis audit:
+
+- strongly supported:
+  - middle verification deficit
+  - middle-to-late attention evolution
+  - anchor-middle mismatch
+  - removed / persistent / introduced are not identical failure paths
+- weak but still useful:
+  - late readiness surge as a relative rank-jump story
+  - diffuse attention
+  - head agreement
+  - layer consistency
+  - visual sensitivity
+- weak or not useful as standalone rules:
+  - diffuse entropy alone
+  - pure concentration alone
+  - absolute late confidence alone
 
 Signals to de-prioritize as standalone rules:
 
@@ -64,6 +85,11 @@ Next measurement focus:
 - explicitly separate:
   - within-trajectory verification signals
   - shared-event trajectory-delta signals
+- keep the hypothesis registry framing:
+  - mechanism evidence
+  - supporting validation evidence
+  - correction-facing candidate evidence
+  - insufficient runtime rule
 - keep measurement first and method design second
 
 The practical question is:
@@ -84,6 +110,7 @@ This means:
 - early-anchor stays fixed
 - the research surface moves to internal measurement
 - layer-wise anchor signals can still be audited, but not promoted to a new default decoding anchor yet
+- no new correction method should start without a fresh user-approved design discussion
 
 ### D. Fourth: keep the failed guard family paused
 
@@ -95,6 +122,7 @@ Stay paused:
 - `middle_verified`
 - `middle_refined`
 - broad always-on layer-anchor replacement as a new main-line decoding method
+- runtime mismatch-trigger methods
 
 Why:
 
@@ -113,10 +141,13 @@ That means:
 - it should remain competitive against middle attention mass and mass-evolution signals
 - it should remain meaningful not only on `introduced vs correct`, but also under the relevant paired shared-event view
 - it should have a plausible correction interface that is narrower than the failed guard family
+- and the user should explicitly want to turn the evidence line back into a method-design round
 
 Likely acceptable future directions, if justified later:
 
 - first-logit-side object-local middle verification
+- middle-to-late attention evolution with stronger causal support
+- anchor-middle mismatch with better control evidence
 - layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
 - phrase-level or trajectory-level methods only if the method boundary becomes much cleaner than the current shared-delta story
@@ -128,20 +159,26 @@ Not now:
 - no new token-level clipping variant
 - no broad object suppression
 - no broad anchor cleaning
+- no new layer-anchor replacement branch
 - no threshold search
 - no classifier training
 - no new benchmark branch for this question
 - no attempt to turn weak entropy-only effects into a runtime controller
 - no immediate second round of layer-anchor replacement tuning
 - no immediate mismatch-trigger runtime implementation
+- no automatic jump from evidence discovery to correction design
 
 ## 4. Current Recommendation
 
 1. keep fixed `first_logit / early-anchor` as the locked decoding reference
 2. treat internal hallucination signal discovery as the main active research thread
 3. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
-4. treat visual sensitivity as supporting verification, not a standalone rule
+4. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
 5. do not turn the current weak shared-event trajectory deltas into a runtime controller
 6. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
 7. do not turn the current mismatch signals into a runtime controller yet
-8. only return to correction methods when the signal side is clearly strong enough to justify a new action unit
+8. if methods are revisited later, center them on the strongest supported families:
+   - middle verification deficit
+   - middle-to-late attention evolution
+   - anchor-middle mismatch
+9. do not start any new correction method without explicit user discussion and approval first
