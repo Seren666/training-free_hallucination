@@ -579,3 +579,58 @@ Classifier-distillation takeaway:
 - distilled training-free scores improve the mechanism story and help the introduced slice
 - but the training-free route still does not close the gap to the learned upper-bound
 - training-free should remain the preferred route, with classifier kept as backup / diagnostic only
+
+## 27. Weighted Evidence Consistency Audit
+
+| Item | Result |
+|---|---|
+| scope | preregistered training-free weighted mention-level verification over the existing balanced `4000`-event table |
+| new probe | none |
+| weighting rule | manual signal-strength-aware / failure-mode-aware weights; no learned weights and no threshold tuning |
+| weighted score families | `global`, `introduced_focused`, `persistent_focused`, `removed_focused`, `risk_minus_rescue` |
+| global weighted on `hallucinated_vs_correct` | `global_weighted_evidence_score = 0.2922`, above best single `0.2745` and old equal-weight composite `0.2684` |
+| introduced-focused on `introduced_vs_correct` | `introduced_focused_weighted_score = 0.3309`, above best single `0.3198` and old composite `0.3091` |
+| persistent-focused on `persistent_vs_correct` | `persistent_focused_weighted_score = 0.2337`, above best single `0.2173` and well above old composite `0.1735` |
+| removed-focused on `removed_vs_correct` | `removed_focused_weighted_score = 0.3431`, above best single `0.3252` and old composite `0.3227` |
+| risk-minus-rescue on `hallucinated_vs_correct` | `risk_minus_rescue_weighted_score = 0.2965`, strongest current global-style weighted score |
+| control robustness | all five weighted scores are `high` on category / position / source under the standard control summary |
+| score-level missing rate | `0.0000` after available-evidence renormalization; shape and sensitivity still keep only small weights |
+| multi-seed stability | task-matched weighted scores show low std on test splits, about `0.0088` to `0.0213` |
+| task-matched test ROC-AUC | `0.8069`, `0.8503`, `0.7460`, `0.8556` on hallucinated / introduced / persistent / removed |
+| classifier upper-bound mean ROC-AUC | still higher at `0.8712`, `0.9166`, `0.8062`, `0.9105` |
+| classifier control-only mean ROC-AUC | `0.8099`, `0.8588`, `0.7639`, `0.8600`; weighted training-free narrows the gap but does not consistently beat the control-only classifier on split-based evaluation |
+
+Weighted-audit takeaway:
+
+- weighted training-free verification is now stronger than both:
+  - the best single signal
+  - the old equal-weight composite
+- the biggest training-free gain is no longer only the introduced slice
+- persistent improves materially:
+  - from `0.1735` under the old equal-weight composite
+  - to `0.2337` under `persistent_focused_weighted_score`
+- removed is the cleanest target-task success case:
+  - `removed_focused_weighted_score = 0.3431`
+- the strongest current training-free verifier is now a weighted evidence score family, not a single signal
+- classifier backup is still worth preserving because the weighted route remains about `0.055` to `0.066` mean ROC-AUC below the upper-bound diagnostic on split-based tests
+
+Current best training-free mention-level verification candidates:
+
+- `risk_minus_rescue_weighted_score`
+- `global_weighted_evidence_score`
+- `introduced_focused_weighted_score`
+- `persistent_focused_weighted_score`
+- `removed_focused_weighted_score`
+- `middle_x_mass_change`
+- `mass_change_late_minus_mid`
+- `anchor_masschange_x_late_mass`
+- `image_attention_middle_mean`
+
+Current boundary update:
+
+- weighted training-free verification is now strong enough to support a bounded second-pass correction **design discussion**
+- it is still **not** enough to justify correction implementation without an explicit user-approved design round
+- classifier remains:
+  - upper-bound diagnostic
+  - backup verifier
+  - not the main method

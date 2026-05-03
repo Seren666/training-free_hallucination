@@ -36,6 +36,14 @@ Immediate focus:
 - treat the new training-free multidimensional verification result as a refinement, not a reset:
   - best composite is still `middle_to_late_abnormal_evolution`
   - it remains robust, but does not beat the best single signal
+- treat the new weighted-evidence result as the current strongest training-free mention-level verifier:
+  - task-matched weighted scores now beat both the best single signal and the old equal-weight composite on all four main tasks
+  - the strongest global-style weighted scores are `risk_minus_rescue_weighted_score` and `global_weighted_evidence_score`
+  - the failure-mode-specific scores are now:
+    - `introduced_focused_weighted_score`
+    - `persistent_focused_weighted_score`
+    - `removed_focused_weighted_score`
+  - persistent remains hardest, but its shortfall improves materially under weighted scoring
 - treat the optional lightweight classifier as an upper-bound diagnostic only:
   - it confirms the signals contain learnable hallucination information
   - it does not become the new primary method line
@@ -45,6 +53,10 @@ Immediate focus:
 - treat the distillation result as partial, not decisive:
   - introduced-focused distilled mismatch helps
   - global distilled training-free scores still do not close the gap to the upper-bound
+- treat the weighted follow-up as a stronger but still incomplete training-free consolidation:
+  - it closes part of the gap left by equal weighting
+  - it still stays below the classifier upper-bound on split-based evaluation
+  - it does not remove the need for a backup verifier
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
 - treat the new layer-wise anchor result as a useful negative method result:
   - late-layer ensemble anchors can look cleaner offline
@@ -56,6 +68,7 @@ Current strongest families to build on:
 - middle-to-late attention-mass change
 - middle-x-mass-change interaction
 - anchor-plus-verification interaction
+- weighted combinations of those same three dominant families
 - controlled visual sensitivity with random-mask comparison
 - first-logit-gap x verification-evolution interaction
 - layer-group comparisons as a descriptive audit surface, especially:
@@ -77,6 +90,11 @@ Current evidence status after the hypothesis audit:
   - internal-only learned verification is stable across seeds
   - classifier-with-controls is stronger, but category terms absorb too much of the linear explanation to become the preferred story
   - distilled training-free scores help the introduced slice more than the global binary task
+- now additionally supported after weighted consolidation:
+  - signal-strength-aware training-free weighting is worthwhile
+  - failure-mode-aware training-free weighting is worthwhile
+  - weighted scores now beat the best single signal at mention level
+  - weighted scores also beat the old equal-weight composite at mention level
 - weak but still useful:
   - late readiness surge as a relative rank-jump story
   - diffuse attention
@@ -127,6 +145,7 @@ The practical question is:
 - which signals keep ranking near the top when the subset, object mix, control design, and pairing setup change
 - and whether they remain strongest on the `first_logit`-side `introduced vs correct` split rather than only on weak paired deltas
 - and whether the mention-level verification story is strong enough to justify a user-approved second-pass correction design discussion
+- and whether the new weighted verifier should be the default training-free verification surface for any future design discussion
 - and whether the gap between training-free composite and classifier is better closed by stronger causal validation rather than more decoding heuristics
 - and whether the next training-free attempt should stay global or become more intentionally introduced-focused
 
@@ -183,7 +202,7 @@ Likely acceptable future directions, if justified later:
 - middle-to-late attention evolution with stronger causal support
 - anchor-middle mismatch with better control evidence
 - mention-level verification as a second-pass design surface, but only after user approval
-- a training-free one-forward verification surface is still plausible, but not solved
+- a weighted training-free verification surface is now the strongest current non-learned route, but still not solved
 - an introduced-focused training-free verifier now looks more plausible than a fully global distilled score
 - layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
@@ -215,17 +234,18 @@ Not now:
 2. treat internal hallucination signal discovery as the main active research thread
 3. treat mention-level verification as the current highest-value narrowing step between mechanism story and any future correction discussion
 4. keep the training-free composite line active, but recognize that the current equal-weight composite still trails the best single evolution signal
-5. keep the lightweight classifier only as a backup upper-bound check that the internal signals carry learnable information
-6. treat the new multi-seed classifier result as backup evidence, not as permission to pivot the project toward learned verification
-7. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
-8. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
-9. do not turn the current weak shared-event trajectory deltas into a runtime controller
-10. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
-11. do not turn the current mismatch signals into a runtime controller yet
-12. if methods are revisited later, center them on the strongest supported families:
+5. upgrade the weighted training-free evidence score family to the current default mention-level verification surface
+6. keep the lightweight classifier only as a backup upper-bound check that the internal signals carry learnable information
+7. treat the new multi-seed classifier result as backup evidence, not as permission to pivot the project toward learned verification
+8. prioritize middle-attention mass, mass-evolution, anchor-plus-verification interactions, and their weighted combinations over diffuse-entropy heuristics
+9. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
+10. do not turn the current weak shared-event trajectory deltas into a runtime controller
+11. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
+12. do not turn the current mismatch signals into a runtime controller yet
+13. if methods are revisited later, center them on the strongest supported families:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-13. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
-14. if that discussion happens, prefer a narrowly scoped training-free route first; keep classifier as backup verifier only
-15. do not start any correction implementation without explicit user discussion and approval first
+14. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
+15. if that discussion happens, prefer a narrowly scoped training-free weighted route first; keep classifier as backup verifier only
+16. do not start any correction implementation without explicit user discussion and approval first
