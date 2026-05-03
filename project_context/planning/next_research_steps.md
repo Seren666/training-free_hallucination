@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the first mention-level verification audit, running the multidimensional-evidence verification follow-up, and finishing the classifier-diagnostic distillation audit.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the mention-level verification / weighted-verifier line, and running the bounded second-pass correction action pilot.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -227,6 +227,7 @@ Not now:
 - no immediate mismatch-trigger runtime implementation
 - no automatic jump from evidence discovery to correction design
 - no automatic jump from mention-level verification to second-pass correction implementation
+- no automatic jump from a successful `1000`-image correction pilot to full `40504`-image confirmation
 
 ## 4. Current Recommendation
 
@@ -246,6 +247,42 @@ Not now:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-14. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
-15. if that discussion happens, prefer a narrowly scoped training-free weighted route first; keep classifier as backup verifier only
-16. do not start any correction implementation without explicit user discussion and approval first
+14. treat the completed second-pass action pilot as a bounded feasibility result, not as permission to auto-expand any correction route
+15. if the user wants to continue, the next acceptable step is a user-approved discussion around:
+   - full confirmation of `removal_top10`
+   - or a narrower follow-up centered on `dual_phrase_replace`
+   - or stronger causal verification analysis before any new correction refinement
+16. keep the weighted training-free verifier as the primary mention-level evidence source for any such discussion
+17. keep classifier as backup verifier / upper-bound diagnostic only
+18. do not start any full run or new correction implementation without explicit user discussion and approval first
+
+## 5. After Second-Pass Action Pilot
+
+Current pilot status:
+
+- completed on the fixed `first_logit` `1000`-image subset
+- verification-only ranking is clearly useful:
+  - base hallucinated-mention rate: `9.2%`
+  - top `10%` precision: `33.7%`
+  - top `5%` precision: `42.5%`
+- best raw correction pilot: `removal_top10`
+- best quality-preserving correction pilot: `dual_phrase_replace`
+- weaker routes:
+  - `dual_sentence_rollback`
+  - `local_regen` in its current greedy rewrite form
+
+What this means:
+
+- training-free weighted verification remains the main signal surface
+- correction is now worth discussing, but still not worth auto-scaling
+- the project should not pivot to classifier-led correction
+- the next step, if any, must be a user-approved choice between:
+  - full confirmation of the best current action
+  - or a narrow follow-up comparing the two healthiest actions
+
+What stays fixed:
+
+- no new decoding
+- no threshold search
+- no automatic full run
+- no Codex-initiated correction redesign without user confirmation

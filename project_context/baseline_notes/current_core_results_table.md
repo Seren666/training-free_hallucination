@@ -634,3 +634,59 @@ Current boundary update:
   - upper-bound diagnostic
   - backup verifier
   - not the main method
+
+## 28. Second-Pass Correction Action Pilot
+
+| Item | Result |
+|---|---|
+| scope | verification-guided second-pass pilot on fixed `first_logit` `1000`-image captions |
+| risk source | weighted training-free mention-level verifier; primary risk is `max(global, introduced, persistent, removed)` |
+| actionable mention pool | `2107` mentions across `982` images |
+| hallucinated mention rate in pool | `194 / 2107 = 9.2%` |
+| verification-only top `5%` | precision `0.4245`, recall `0.2320` |
+| verification-only top `10%` | precision `0.3365`, recall `0.3660` |
+| verification-only top `20%` | precision `0.2867`, recall `0.6237` |
+| top `10%` dominant risk families | `introduced_focused=176`, `persistent_focused=26`, `removed_focused=9` |
+| top `10%` position mix | `late=151`, `middle=54`, `early=6` |
+| best raw action | `removal_top10` |
+| best quality-preserving action | `dual_phrase_replace` |
+| failed action | `local_regen` under the current greedy rewrite setup; `0` captions changed |
+
+Unified pilot metrics:
+
+| Method | CHAIRs | CHAIRi | Object Mentions | Correct Object Mentions | Hallucinated Object Count | Delta Hallucinated vs fixed |
+|---|---:|---:|---:|---:|---:|---:|
+| fixed `first_logit` | `0.1610` | `0.0509` | `4717` | `4477` | `240` | `0` |
+| `removal_top10` | `0.1290` | `0.0413` | `4580` | `4391` | `189` | `-51` |
+| `removal_top5` | `0.1370` | `0.0431` | `4615` | `4416` | `199` | `-41` |
+| `dual_phrase_replace` | `0.1400` | `0.0442` | `4637` | `4432` | `205` | `-35` |
+| `dual_sentence_rollback` | `0.1490` | `0.0481` | `4657` | `4433` | `224` | `-16` |
+| `local_regen` | `0.1610` | `0.0509` | `4717` | `4477` | `240` | `0` |
+
+Second-pass takeaway:
+
+- the weighted verifier is strong enough to drive useful risk ranking:
+  - top `10%` precision rises to `33.7%` from a `9.2%` base rate
+- `removal_top10` is the strongest metric pilot:
+  - `CHAIRs 0.1290`
+  - `CHAIRi 0.0413`
+  - hallucinated objects `240 -> 189`
+- `dual_phrase_replace` is the cleanest editing route:
+  - smaller object-mention loss than removal
+  - smaller correct-mention loss than removal
+  - but weaker raw metric gain
+- `dual_sentence_rollback` is less attractive:
+  - smaller gain
+  - more splice / coherence issues
+- `local_regen` is currently ineffective:
+  - the model reproduced the original captions under the current rewrite prompt
+
+Current boundary update:
+
+- this pilot is enough to justify a user-approved full-confirmation **discussion**
+- it is **not** enough to justify automatic full expansion
+- any next correction step should stay centered on:
+  - weighted training-free verification
+  - conservative local removal
+  - dual-caption phrase replacement
+- classifier remains backup only
