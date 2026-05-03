@@ -1,6 +1,6 @@
 # Current Core Results Table
 
-> Date: 2026-05-02
+> Date: 2026-05-03
 > Scope: condensed view of the current benchmark conclusions after the completed POPE and COCO-CHAIR work.
 
 ## 1. POPE First-Logit
@@ -200,7 +200,7 @@ Follow-up takeaway:
 3. treat `middle_refined` as a negative anchor-construction pilot: more meaningful than clipping, but still broad in its current form
 4. keep the middle-layer audit as mechanism evidence, but do not assume it already gives a working runtime or anchor-construction rule
 5. do not start full COCO-CHAIR for a new variant unless it beats fixed `first_logit` on a `1000` pilot without object-mention collapse
-6. do not immediately start parameter sweep, new benchmark expansion, or classifier work
+6. do not immediately start parameter sweep or new benchmark expansion; any classifier branch should remain upper-bound diagnostic only
 
 ## 12. Dual-Trajectory Mention Selection Feasibility
 
@@ -515,3 +515,38 @@ Current boundary:
 - this is enough to support a future second-pass correction **discussion**
 - it is **not** enough to justify implementing a correction method yet
 - Codex should not jump from this audit directly into second-pass correction without user approval
+
+## 25. Multidimensional Evidence Verification
+
+| Item | Result |
+|---|---|
+| scope | training-free multi-dimensional mention-level verification plus optional lightweight classifier upper bound |
+| dataset | reused the existing balanced `4000`-event mention-level table |
+| new probe | none |
+| training-free composite rule | equal-weight direction-aligned z-score average; no learned weights and no threshold tuning |
+| best composite on `hallucinated_vs_correct` | `middle_to_late_abnormal_evolution_score`, `abs(AUC-0.5)=0.2684` |
+| best single vs best composite | best single stays `middle_x_mass_change=0.2745`, so composite does **not** beat the best single |
+| introduced vs correct | best composite `middle_to_late_abnormal_evolution_score=0.3091`; best single remains `middle_x_mass_change=0.3198` |
+| removed vs correct | best composite `middle_to_late_abnormal_evolution_score=0.3227`; best single remains `middle_x_mass_change=0.3252` |
+| persistent vs correct | still hardest slice; best composite only `0.1735` |
+| best composite robustness | `middle_to_late_abnormal_evolution_score`: category `moderate`, position `high`, source `high` |
+| attention-shape composite | weak: `0.0295` with `50.45%` missing rate |
+| classifier split | by `image_id`, `60 / 20 / 20`, seed `55` |
+| control definition for classifier | `object_category + mention_position_ratio` only |
+| best val-selected classifier | all four tasks select `E_all_internal_plus_controls`; test ROC-AUCs: `0.8792`, `0.9211`, `0.8271`, `0.9175` |
+| internal-only vs control-only | `F_all_internal_minus_controls` beats `G_category_position_control` on all four tasks |
+| best standalone learned family | `C_anchor_middle_mismatch_only`: `0.8414`, `0.8844`, `0.7841`, `0.8762` across the four main tasks |
+| attention-shape-only classifier family | still weakest: `0.6470`, `0.6891`, `0.5888`, `0.6690` |
+
+Multidimensional-verification takeaway:
+
+- multi-dimensional evidence clearly helps mention-level verification
+- the training-free route is still plausible, but the current equal-weight composite does not beat the best single evolution signal
+- the lightweight classifier substantially beats the training-free composite, so the internal signals contain real learnable hallucination information
+- the most important families remain:
+  - middle visual verification
+  - middle-to-late evolution
+  - anchor-middle mismatch
+- attention shape remains supporting evidence, not the main verification core
+- this is enough to support a future correction **discussion**
+- it is still not enough to justify automatic correction implementation or a classifier-first method pivot

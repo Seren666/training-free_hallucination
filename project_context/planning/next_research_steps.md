@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, and finishing the first mention-level verification audit.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the first mention-level verification audit, and running the multidimensional-evidence verification follow-up.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -33,6 +33,12 @@ Immediate focus:
 - treat middle-to-late attention evolution as the strongest current evidence family
 - treat anchor-middle mismatch interaction as the strongest first-logit-side mismatch family
 - treat mention-level verification as now feasible at a diagnostic level
+- treat the new training-free multidimensional verification result as a refinement, not a reset:
+  - best composite is still `middle_to_late_abnormal_evolution`
+  - it remains robust, but does not beat the best single signal
+- treat the optional lightweight classifier as an upper-bound diagnostic only:
+  - it confirms the signals contain learnable hallucination information
+  - it does not become the new primary method line
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
 - treat the new layer-wise anchor result as a useful negative method result:
   - late-layer ensemble anchors can look cleaner offline
@@ -60,6 +66,7 @@ Current evidence status after the hypothesis audit:
 - now additionally supported at mention level:
   - hallucinated object mentions can be distinguished from correct mentions above chance
   - the best mention-level candidates are still evolution + mismatch + middle-verification signals
+  - multi-dimensional learned combination improves further over the training-free composite
 - weak but still useful:
   - late readiness surge as a relative rank-jump story
   - diffuse attention
@@ -98,6 +105,8 @@ Next measurement focus:
   - diagnostic verification only
   - not a runtime selector
   - not a correction method yet
+  - training-free composite remains the main mechanism-facing route
+  - classifier remains backup evidence only
 - keep measurement first and method design second
 
 The practical question is:
@@ -105,6 +114,7 @@ The practical question is:
 - which signals keep ranking near the top when the subset, object mix, control design, and pairing setup change
 - and whether they remain strongest on the `first_logit`-side `introduced vs correct` split rather than only on weak paired deltas
 - and whether the mention-level verification story is strong enough to justify a user-approved second-pass correction design discussion
+- and whether the gap between training-free composite and classifier is better closed by stronger causal validation rather than more decoding heuristics
 
 ### C. Third: keep early-anchor as the fixed decoding reference, not the optimization target
 
@@ -159,6 +169,7 @@ Likely acceptable future directions, if justified later:
 - middle-to-late attention evolution with stronger causal support
 - anchor-middle mismatch with better control evidence
 - mention-level verification as a second-pass design surface, but only after user approval
+- a training-free one-forward verification surface is still plausible, but not solved
 - layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
 - phrase-level or trajectory-level methods only if the method boundary becomes much cleaner than the current shared-delta story
@@ -172,7 +183,9 @@ Not now:
 - no broad anchor cleaning
 - no new layer-anchor replacement branch
 - no threshold search
-- no classifier training
+- no further classifier expansion as a main-line method
+- no heavy learned verifier branch
+- no classifier claim beyond upper-bound diagnostic evidence
 - no new benchmark branch for this question
 - no attempt to turn weak entropy-only effects into a runtime controller
 - no immediate second round of layer-anchor replacement tuning
@@ -185,14 +198,16 @@ Not now:
 1. keep fixed `first_logit / early-anchor` as the locked decoding reference
 2. treat internal hallucination signal discovery as the main active research thread
 3. treat mention-level verification as the current highest-value narrowing step between mechanism story and any future correction discussion
-4. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
-5. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
-6. do not turn the current weak shared-event trajectory deltas into a runtime controller
-7. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
-8. do not turn the current mismatch signals into a runtime controller yet
-9. if methods are revisited later, center them on the strongest supported families:
+4. keep the training-free composite line active, but recognize that the current equal-weight composite still trails the best single evolution signal
+5. keep the lightweight classifier only as a backup upper-bound check that the internal signals carry learnable information
+6. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
+7. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
+8. do not turn the current weak shared-event trajectory deltas into a runtime controller
+9. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
+10. do not turn the current mismatch signals into a runtime controller yet
+11. if methods are revisited later, center them on the strongest supported families:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-10. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion**, not an implementation jump
-11. do not start any new correction method without explicit user discussion and approval first
+12. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
+13. do not start any new correction method without explicit user discussion and approval first
