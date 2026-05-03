@@ -550,3 +550,32 @@ Multidimensional-verification takeaway:
 - attention shape remains supporting evidence, not the main verification core
 - this is enough to support a future correction **discussion**
 - it is still not enough to justify automatic correction implementation or a classifier-first method pivot
+
+## 26. Classifier Diagnostic And Distillation
+
+| Item | Result |
+|---|---|
+| scope | multi-seed lightweight classifier diagnostic plus training-free score distillation |
+| seeds | `55, 56, 57, 58, 59` |
+| split | `image_id` only, `60 / 20 / 20` |
+| best upper-bound setting | `C_internal_plus_category_position` on all four main tasks |
+| upper-bound mean ROC-AUC | `0.8712` hallucinated, `0.9166` introduced, `0.8062` persistent, `0.9105` removed |
+| stability | all four upper-bound tasks show low std, about `0.0116` to `0.0257` |
+| internal-only mean ROC-AUC | `0.8540`, `0.9016`, `0.7945`, `0.8991` on the same four tasks |
+| internal-only vs control-only | `A_internal_features_only` beats `B_category_position_control` on all `5/5` seeds for all four tasks |
+| best family-only setting | `E_anchor_middle_mismatch_only` on all four tasks |
+| weakest family-only setting | `E_attention_shape_only` on all four tasks |
+| coefficient caveat | with controls enabled, category one-hot features dominate raw linear coefficient mass |
+| internal-only family picture | still aligns with mechanism: middle verification, anchor mismatch, and evolution remain the core families |
+| best distilled global score | `distilled_middle_to_late_dominant_score = 0.2684` on `hallucinated_vs_correct`, exactly matching the old best evolution composite |
+| best distilled improvement | `distilled_anchor_middle_mismatch_score = 0.3213` on `introduced_vs_correct`, slightly above best single `0.3198` and above old composite `0.3091` |
+| global distilled verdict | no distilled score clearly beats the best single signal overall |
+| gap to upper-bound | still about `0.103`, `0.095`, `0.133`, `0.088` on hallucinated / introduced / persistent / removed |
+
+Classifier-distillation takeaway:
+
+- classifier backup is stable and worth preserving
+- internal features genuinely carry verification signal beyond category and position controls
+- distilled training-free scores improve the mechanism story and help the introduced slice
+- but the training-free route still does not close the gap to the learned upper-bound
+- training-free should remain the preferred route, with classifier kept as backup / diagnostic only

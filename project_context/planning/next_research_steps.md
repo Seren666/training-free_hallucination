@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the first mention-level verification audit, and running the multidimensional-evidence verification follow-up.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the first mention-level verification audit, running the multidimensional-evidence verification follow-up, and finishing the classifier-diagnostic distillation audit.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -39,6 +39,12 @@ Immediate focus:
 - treat the optional lightweight classifier as an upper-bound diagnostic only:
   - it confirms the signals contain learnable hallucination information
   - it does not become the new primary method line
+- treat the new multi-seed diagnostic as stable enough to preserve:
+  - upper-bound performance is repeatable across seeds
+  - internal-only features still beat category + position control consistently
+- treat the distillation result as partial, not decisive:
+  - introduced-focused distilled mismatch helps
+  - global distilled training-free scores still do not close the gap to the upper-bound
 - treat shared-event `regular -> early-anchor` delta only as a boundary check, not the main method direction
 - treat the new layer-wise anchor result as a useful negative method result:
   - late-layer ensemble anchors can look cleaner offline
@@ -67,6 +73,10 @@ Current evidence status after the hypothesis audit:
   - hallucinated object mentions can be distinguished from correct mentions above chance
   - the best mention-level candidates are still evolution + mismatch + middle-verification signals
   - multi-dimensional learned combination improves further over the training-free composite
+- now additionally supported after distillation:
+  - internal-only learned verification is stable across seeds
+  - classifier-with-controls is stronger, but category terms absorb too much of the linear explanation to become the preferred story
+  - distilled training-free scores help the introduced slice more than the global binary task
 - weak but still useful:
   - late readiness surge as a relative rank-jump story
   - diffuse attention
@@ -107,6 +117,9 @@ Next measurement focus:
   - not a correction method yet
   - training-free composite remains the main mechanism-facing route
   - classifier remains backup evidence only
+- keep the classifier boundary explicit:
+  - preserve it as a backup verifier / upper-bound diagnostic
+  - do not let it become the default next method
 - keep measurement first and method design second
 
 The practical question is:
@@ -115,6 +128,7 @@ The practical question is:
 - and whether they remain strongest on the `first_logit`-side `introduced vs correct` split rather than only on weak paired deltas
 - and whether the mention-level verification story is strong enough to justify a user-approved second-pass correction design discussion
 - and whether the gap between training-free composite and classifier is better closed by stronger causal validation rather than more decoding heuristics
+- and whether the next training-free attempt should stay global or become more intentionally introduced-focused
 
 ### C. Third: keep early-anchor as the fixed decoding reference, not the optimization target
 
@@ -170,6 +184,7 @@ Likely acceptable future directions, if justified later:
 - anchor-middle mismatch with better control evidence
 - mention-level verification as a second-pass design surface, but only after user approval
 - a training-free one-forward verification surface is still plausible, but not solved
+- an introduced-focused training-free verifier now looks more plausible than a fully global distilled score
 - layer-group signal analysis, but not direct late-layer anchor replacement
 - mention-level verification with stronger causal support
 - phrase-level or trajectory-level methods only if the method boundary becomes much cleaner than the current shared-delta story
@@ -186,6 +201,7 @@ Not now:
 - no further classifier expansion as a main-line method
 - no heavy learned verifier branch
 - no classifier claim beyond upper-bound diagnostic evidence
+- no classifier-led correction implementation
 - no new benchmark branch for this question
 - no attempt to turn weak entropy-only effects into a runtime controller
 - no immediate second round of layer-anchor replacement tuning
@@ -200,14 +216,16 @@ Not now:
 3. treat mention-level verification as the current highest-value narrowing step between mechanism story and any future correction discussion
 4. keep the training-free composite line active, but recognize that the current equal-weight composite still trails the best single evolution signal
 5. keep the lightweight classifier only as a backup upper-bound check that the internal signals carry learnable information
-6. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
-7. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
-8. do not turn the current weak shared-event trajectory deltas into a runtime controller
-9. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
-10. do not turn the current mismatch signals into a runtime controller yet
-11. if methods are revisited later, center them on the strongest supported families:
+6. treat the new multi-seed classifier result as backup evidence, not as permission to pivot the project toward learned verification
+7. prioritize middle-attention mass, mass-evolution, and anchor-plus-verification interactions over diffuse-entropy heuristics
+8. treat visual sensitivity, head agreement, and layer consistency as supporting verification, not standalone rules
+9. do not turn the current weak shared-event trajectory deltas into a runtime controller
+10. treat layer-wise anchor evidence as descriptive support, not as a new default anchor source
+11. do not turn the current mismatch signals into a runtime controller yet
+12. if methods are revisited later, center them on the strongest supported families:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-12. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
-13. do not start any new correction method without explicit user discussion and approval first
+13. if the user wants to continue, the next acceptable step is a second-pass correction **design discussion** or stronger causal verification analysis, not an implementation jump
+14. if that discussion happens, prefer a narrowly scoped training-free route first; keep classifier as backup verifier only
+15. do not start any correction implementation without explicit user discussion and approval first
