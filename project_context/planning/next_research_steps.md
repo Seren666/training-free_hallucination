@@ -1,7 +1,7 @@
 # Next Research Steps
 
 > Date: 2026-05-03
-> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the mention-level verification / weighted-verifier line, and running the bounded second-pass correction action pilot.
+> Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the mention-level verification / weighted-verifier line, and running the strict second-pass correction action matrix pilot.
 
 ## 1. Current Reference To Keep Fixed
 
@@ -247,29 +247,38 @@ Not now:
    - middle verification deficit
    - middle-to-late attention evolution
    - anchor-middle mismatch
-14. treat the completed second-pass action pilot as a bounded feasibility result, not as permission to auto-expand any correction route
+14. treat the completed strict second-pass action matrix pilot as a bounded feasibility result, not as permission to auto-expand any correction route
 15. if the user wants to continue, the next acceptable step is a user-approved discussion around:
-   - full confirmation of `removal_top10`
-   - or a narrower follow-up centered on `dual_phrase_replace`
+   - full confirmation of `firstlogit_removal_top10`
+   - or a narrower follow-up centered on `dual_phrase_replace_v1`
+   - or a two-route confirmation comparing both
    - or stronger causal verification analysis before any new correction refinement
 16. keep the weighted training-free verifier as the primary mention-level evidence source for any such discussion
 17. keep classifier as backup verifier / upper-bound diagnostic only
 18. do not start any full run or new correction implementation without explicit user discussion and approval first
 
-## 5. After Second-Pass Action Pilot
+## 5. After Strict Second-Pass Action Matrix Pilot
 
 Current pilot status:
 
-- completed on the fixed `first_logit` `1000`-image subset
+- completed on aligned `regular` / fixed `first_logit` / dual-caption `1000`-image pilots
 - verification-only ranking is clearly useful:
-  - base hallucinated-mention rate: `9.2%`
-  - top `10%` precision: `33.7%`
-  - top `5%` precision: `42.5%`
-- best raw correction pilot: `removal_top10`
-- best quality-preserving correction pilot: `dual_phrase_replace`
-- weaker routes:
+  - `regular` base hallucinated-mention rate: `11.31%`
+  - `regular` top `10%` precision: `43.86%`
+  - fixed `first_logit` base hallucinated-mention rate: `9.21%`
+  - fixed `first_logit` top `10%` precision: `33.65%`
+  - source-exclusive mentions are the sharpest slices:
+    - `regular_only top10 precision = 52.35%`
+    - `first_logit_only top10 precision = 48.00%`
+- best raw correction pilot: `firstlogit_removal_top10`
+- best preservation route overall: `caption_level_fallback_diagnostic`, but diagnostic-only
+- best preservation route among main candidates: `dual_phrase_replace_v1`
+- interesting source result:
+  - `regular_removal_top10` nearly matches fixed-baseline CHAIR while starting from the weaker `regular` source
+- weaker or failed routes:
   - `dual_sentence_rollback`
-  - `local_regen` in its current greedy rewrite form
+  - `dual_phrase_replace_strict`
+  - `local_regen_v2` with `0` changed captions
 
 What this means:
 
@@ -277,8 +286,11 @@ What this means:
 - correction is now worth discussing, but still not worth auto-scaling
 - the project should not pivot to classifier-led correction
 - the next step, if any, must be a user-approved choice between:
-  - full confirmation of the best current action
-  - or a narrow follow-up comparing the two healthiest actions
+  - full confirmation of `firstlogit_removal_top10`
+  - or full confirmation of `dual_phrase_replace_v1`
+  - or a paired confirmation comparing both under the same evaluation frame
+- `caption_level_fallback_diagnostic` can stay only as a preservation reference, not the main deployed route
+- Codex must not start a full run or invent a new correction route without user discussion first
 
 What stays fixed:
 
@@ -286,3 +298,5 @@ What stays fixed:
 - no threshold search
 - no automatic full run
 - no Codex-initiated correction redesign without user confirmation
+- training-free weighted verification remains the main evidence source
+- classifier remains backup only
