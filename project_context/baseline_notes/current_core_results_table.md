@@ -1,6 +1,7 @@
 # Current Core Results Table
 
 > Date: 2026-05-03
+> Updated: 2026-05-04
 > Scope: condensed view of the current benchmark conclusions after the completed POPE and COCO-CHAIR work.
 
 ## 1. POPE First-Logit
@@ -54,12 +55,17 @@ Alignment takeaway:
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | fixed `first_logit` | 40504 | 0.1631 | 0.0513 | 187440 | 177831 | 9609 | 0 | 0 | locked generation baseline |
 | `firstlogit_removal_top10` | 40504 | 0.1291 | 0.0413 | 181848 | 174332 | 7516 | -2093 | -3499 | metric-strong aggressive correction branch |
+| `removal_top10_firstlogit_only_guard` | 40504 | 0.1356 | 0.0430 | 183820 | 175912 | 7908 | -1701 | -1919 | safer-removal diagnostic branch |
 | `dual_phrase_replace_v1` | 40504 | 0.1403 | 0.0444 | 184391 | 176204 | 8187 | -1422 | -1627 | quality-preserving correction branch |
 
 Full correction takeaway:
 
 - both branches remain clearly better than fixed `first_logit`
 - `firstlogit_removal_top10` remains the strongest raw-score branch
+- `removal_top10_firstlogit_only_guard` is an additional safer-removal diagnostic branch:
+  - it retains `81.27%` of original removal hallucination reduction
+  - it saves `1580` correct mentions relative to original removal
+  - it does not replace either retained branch
 - `dual_phrase_replace_v1` remains the healthier preservation branch
 - the full result does not overturn the earlier `5000` expanded conclusion
 
@@ -70,6 +76,7 @@ Full correction takeaway:
 | near-official | regular | 40504 | 0.1997 | 0.0669 | 172330 | 11528 |
 | near-official | fixed `first_logit` | 40504 | 0.1594 | 0.0524 | 178315 | 9337 |
 | near-official | `firstlogit_removal_top10` | 40504 | 0.1267 | 0.0424 | 172980 | 7335 |
+| near-official | `removal_top10_firstlogit_only_guard` | 40504 | 0.1329 | 0.0441 | 174848 | 7712 |
 | near-official | `dual_phrase_replace_v1` | 40504 | 0.1374 | 0.0455 | 175394 | 7984 |
 
 Near-official takeaway:
@@ -77,6 +84,7 @@ Near-official takeaway:
 - ordering matches the adapted evaluator
 - full near-official still supports:
   - `firstlogit_removal_top10` as best raw score
+  - `removal_top10_firstlogit_only_guard` as a safer-removal diagnostic branch between original removal and dual
   - `dual_phrase_replace_v1` as the more preservation-friendly second branch
 
 ## 5. Image-Level Audit

@@ -27,19 +27,29 @@ Current full correction result:
   - `CHAIRs=0.1403`
   - `CHAIRi=0.0444`
   - quality-preserving branch
+- `removal_top10_firstlogit_only_guard`
+  - `CHAIRs=0.1356`
+  - `CHAIRi=0.0430`
+  - additional safer-removal diagnostic / exploratory candidate only
 
 Branch policy:
 
-- keep both correction branches retained
-- do not auto-eliminate either branch based on a single metric table
+- retained branches remain exactly:
+  - `firstlogit_removal_top10`
+  - `dual_phrase_replace_v1`
+- keep both retained correction branches alive
+- do not auto-eliminate either retained branch based on a single metric table
 - `firstlogit_removal_top10` remains the aggressive upper-bound-style branch
 - `dual_phrase_replace_v1` remains the cleaner preservation-focused branch
+- `removal_top10_firstlogit_only_guard` is an additional safer-removal diagnostic / exploratory candidate
+- do not auto-replace, delete, rename, or downgrade either retained branch because of Candidate A
 
 Method-line policy:
 
 - weighted training-free verifier remains the main evidence source
 - classifier remains backup diagnostic / upper-bound only
 - do not let Codex start a new method line on its own
+- do not let Codex promote Candidate A into the main retained method set automatically
 - do not resume failed guard / clipping / anchor-replacement families
 - next work should stay in data consolidation / paper discussion mode unless the user explicitly approves a new method round
 
@@ -291,11 +301,13 @@ Not now:
 15. if the user wants to continue, the next acceptable step is a user-approved discussion around:
    - full confirmation of `firstlogit_removal_top10`
    - or a narrower follow-up centered on `dual_phrase_replace_v1`
+   - or interpretation of `removal_top10_firstlogit_only_guard` as an additional safer-removal diagnostic branch
    - or a two-route confirmation comparing both
    - or stronger causal verification analysis before any new correction refinement
 16. keep the weighted training-free verifier as the primary mention-level evidence source for any such discussion
 17. keep classifier as backup verifier / upper-bound diagnostic only
 18. do not start any full run or new correction implementation without explicit user discussion and approval first
+19. do not auto-replace, delete, rename, or downgrade `firstlogit_removal_top10` or `dual_phrase_replace_v1`; Candidate A stays additional / exploratory unless the user explicitly decides otherwise
 
 ## 5. After Strict Second-Pass Action Matrix Pilot
 
@@ -380,3 +392,30 @@ What stays fixed after expansion:
 - classifier remains backup / diagnostic only
 - no full confirmation without user approval
 - no Codex-initiated correction redesign
+
+## 7. After Candidate A Full Diagnostic
+
+Current status:
+
+- Candidate A full diagnostic is now complete:
+  - `method = removal_top10_firstlogit_only_guard`
+  - `CHAIRs=0.1356`
+  - `CHAIRi=0.0430`
+  - retained hallucination-reduction ratio vs original removal: `81.27%`
+  - saved correct mentions vs original removal: `1580`
+
+Policy interpretation:
+
+- Candidate A is worth keeping as an additional safer-removal diagnostic / exploratory candidate
+- Candidate A does not replace `firstlogit_removal_top10` as the metric-strong retained branch
+- Candidate A does not replace `dual_phrase_replace_v1` as the quality-preserving retained branch
+- Codex must not auto-upgrade Candidate A into the retained branch set
+
+What stays fixed after Candidate A:
+
+- retained branches remain exactly:
+  - `firstlogit_removal_top10`
+  - `dual_phrase_replace_v1`
+- weighted training-free verifier remains the main evidence source
+- classifier remains backup only
+- no automatic branch replacement, deletion, renaming, or downgrading

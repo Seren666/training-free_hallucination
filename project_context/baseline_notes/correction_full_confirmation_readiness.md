@@ -368,6 +368,46 @@ Shared pattern:
 - both methods mainly act on source-exclusive risky mentions
 - this is good news for the current mechanism story, because the verifier is not mostly firing on shared/common objects
 
+## 15A. Candidate A Safer-Removal Diagnostic
+
+Candidate A full diagnostic:
+
+- method: `removal_top10_firstlogit_only_guard`
+- rule:
+  - keep the current full top-`10%` risk slice
+  - remove only `first_logit_only` risky mentions
+  - abstain on all `common` mentions
+- adapted full metrics:
+  - `CHAIRs=0.1356`
+  - `CHAIRi=0.0430`
+  - hallucinated objects: `7908`
+  - correct object count: `175912`
+- near-official full metrics:
+  - `CHAIRs=0.1329`
+  - `CHAIRi=0.0441`
+  - hallucinated objects: `7712`
+  - object mentions: `174848`
+
+Tradeoff summary versus original `firstlogit_removal_top10`:
+
+- retains `81.27%` of original removal hallucination reduction
+- saves `1580` correct mentions
+- gives back `392` hallucinated objects
+- edits are fully source-exclusive by construction:
+  - `first_logit_only edit count = 3599`
+  - `common edit count = 0`
+- grammar / coherence heuristic issue rate:
+  - Candidate A: `0.0109`
+  - original removal: `0.0449`
+
+Interpretation:
+
+- Candidate A is useful as an additional safer-removal diagnostic branch
+- it sits between original removal and `dual_phrase_replace_v1`
+- it does **not** replace `firstlogit_removal_top10`
+- it does **not** replace `dual_phrase_replace_v1`
+- the retained full-confirmed branches remain unchanged
+
 ## 16. Historical `5000` Near-Official Alignment
 
 Keep the old expanded subset alignment for reference:
@@ -433,6 +473,8 @@ Next recommendation:
 1. keep both branches alive for paper-facing discussion
 2. present `firstlogit_removal_top10` as the metric-strong aggressive branch
 3. present `dual_phrase_replace_v1` as the quality-preserving branch
-4. keep the weighted training-free verifier as the main evidence source
-5. keep the classifier only as backup / diagnostic
-6. do not let Codex auto-start a new method line without explicit user approval
+4. keep `removal_top10_firstlogit_only_guard` only as an additional safer-removal diagnostic branch
+5. do not let Candidate A replace either retained branch automatically
+6. keep the weighted training-free verifier as the main evidence source
+7. keep the classifier only as backup / diagnostic
+8. do not let Codex auto-start a new method line without explicit user approval

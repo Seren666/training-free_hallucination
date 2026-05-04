@@ -34,7 +34,21 @@ Current read:
 - `top10` remains the preregistered default slice
 - `top20` remains diagnostic only
 
+Candidate A note:
+
+- `removal_top10_firstlogit_only_guard` was checked only as an additional safer-removal diagnostic branch
+- full adapted result:
+  - `CHAIRs=0.1356`
+  - `CHAIRi=0.0430`
+- it keeps `81.27%` of original removal hallucination reduction
+- it saves `1580` correct mentions relative to original removal
+- grammar / coherence heuristic issue rate is lower:
+  - Candidate A `0.0109`
+  - original removal `0.0449`
+- this is useful as a diagnostic middle point between original removal and dual
+- it does **not** replace either retained branch
+
 Next gap:
 
 - no immediate data gap remains for score-first full confirmation itself
-- the next step should be synthesis / paper-facing discussion of the confirmed two-branch result, unless the user explicitly approves a new method-design round
+- the next step should be synthesis / paper-facing discussion of the confirmed two-branch result plus the Candidate A diagnostic comparison, unless the user explicitly approves a new method-design round
