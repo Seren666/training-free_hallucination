@@ -48,6 +48,37 @@ Alignment takeaway:
 - magnitudes are very close
 - current positive result is not an adapted-evaluator illusion
 
+## 4A. Score-First Full Correction Confirmation
+
+| Method | Images | CHAIRs | CHAIRi | Object Mentions | Correct Object Count | Hallucinated Object Count | Delta Hallucinated vs fixed | Delta Correct vs fixed | Current Role |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| fixed `first_logit` | 40504 | 0.1631 | 0.0513 | 187440 | 177831 | 9609 | 0 | 0 | locked generation baseline |
+| `firstlogit_removal_top10` | 40504 | 0.1291 | 0.0413 | 181848 | 174332 | 7516 | -2093 | -3499 | metric-strong aggressive correction branch |
+| `dual_phrase_replace_v1` | 40504 | 0.1403 | 0.0444 | 184391 | 176204 | 8187 | -1422 | -1627 | quality-preserving correction branch |
+
+Full correction takeaway:
+
+- both branches remain clearly better than fixed `first_logit`
+- `firstlogit_removal_top10` remains the strongest raw-score branch
+- `dual_phrase_replace_v1` remains the healthier preservation branch
+- the full result does not overturn the earlier `5000` expanded conclusion
+
+## 4B. Full Correction Near-Official Alignment
+
+| Evaluator | Method | Images | CHAIRs | CHAIRi | Object Mentions | Hallucinated Objects |
+|---|---|---:|---:|---:|---:|---:|
+| near-official | regular | 40504 | 0.1997 | 0.0669 | 172330 | 11528 |
+| near-official | fixed `first_logit` | 40504 | 0.1594 | 0.0524 | 178315 | 9337 |
+| near-official | `firstlogit_removal_top10` | 40504 | 0.1267 | 0.0424 | 172980 | 7335 |
+| near-official | `dual_phrase_replace_v1` | 40504 | 0.1374 | 0.0455 | 175394 | 7984 |
+
+Near-official takeaway:
+
+- ordering matches the adapted evaluator
+- full near-official still supports:
+  - `firstlogit_removal_top10` as best raw score
+  - `dual_phrase_replace_v1` as the more preservation-friendly second branch
+
 ## 5. Image-Level Audit
 
 | Audit | Subset | Main Result | Current Conclusion |

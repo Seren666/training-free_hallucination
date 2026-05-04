@@ -1,7 +1,47 @@
 # Next Research Steps
 
 > Date: 2026-05-03
+> Updated: 2026-05-04
 > Scope: priorities after locking fixed `first_logit / early-anchor` as the decoding reference, completing the hypothesis audit, finishing the mention-level verification / weighted-verifier line, and running the strict second-pass correction action matrix pilot.
+
+## 0. Score-First Full Confirmation Update
+
+Current status:
+
+- full score-first correction confirmation is now complete on `40504` images
+- the full fixed-source weighted risk table is available:
+  - `84406` mention rows
+  - `39606` images with mentions
+- no additional expanded-only follow-up is needed before paper-facing discussion of the current two-branch correction result
+
+Current full correction result:
+
+- fixed `first_logit`
+  - `CHAIRs=0.1631`
+  - `CHAIRi=0.0513`
+- `firstlogit_removal_top10`
+  - `CHAIRs=0.1291`
+  - `CHAIRi=0.0413`
+  - metric-strong branch
+- `dual_phrase_replace_v1`
+  - `CHAIRs=0.1403`
+  - `CHAIRi=0.0444`
+  - quality-preserving branch
+
+Branch policy:
+
+- keep both correction branches retained
+- do not auto-eliminate either branch based on a single metric table
+- `firstlogit_removal_top10` remains the aggressive upper-bound-style branch
+- `dual_phrase_replace_v1` remains the cleaner preservation-focused branch
+
+Method-line policy:
+
+- weighted training-free verifier remains the main evidence source
+- classifier remains backup diagnostic / upper-bound only
+- do not let Codex start a new method line on its own
+- do not resume failed guard / clipping / anchor-replacement families
+- next work should stay in data consolidation / paper discussion mode unless the user explicitly approves a new method round
 
 ## 1. Current Reference To Keep Fixed
 

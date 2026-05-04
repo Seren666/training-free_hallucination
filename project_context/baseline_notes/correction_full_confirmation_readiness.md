@@ -1,6 +1,7 @@
 # Correction Full Confirmation Readiness
 
 > Date: 2026-05-03
+> Updated: 2026-05-04
 > Scope: expanded-confirmation follow-up for weighted-verifier-driven correction on existing COCO-CHAIR captions. This round did not rerun `regular` or fixed `first_logit` generation, did not change the verifier rule, and did not introduce any new correction family.
 
 ## 1. Motivation
@@ -75,6 +76,11 @@ Decision:
 - full confirmation was **not** launched
 - expanded confirmation on `5000` images was completed instead
 - this followed the preregistered rule to avoid starting a new `>8 h` extraction task blindly
+
+Historical note:
+
+- this was the original readiness-stage decision on `2026-05-03`
+- a later resumable full run was approved and did complete, and the final full results are recorded in Sections `12-20`
 
 ## 5. Weighted Verifier On The Expanded Pool
 
@@ -258,14 +264,113 @@ Quality verdict by branch:
   - lower correct-object loss
   - more naturally aligns with a phrase-level correction story
 
+## 12. Full Confirmation Update
+
+The readiness question is now resolved: the score-first full run completed on the full `40504`-image caption pool.
+
+Final full fixed-source risk table:
+
+- mention rows: `84406`
+- images with mentions: `39606`
+- hallucinated mentions: `7781`
+- top `10%` threshold: `0.693014`
+- top `10%` precision / recall: `0.3179 / 0.3448`
+- `first_logit_only` top-`10%` precision: `0.4712`
+- `common` top-`10%` precision: `0.1961`
+
+Interpretation:
+
+- the weighted verifier remains much sharper on source-exclusive risky mentions
+- dominant top-`10%` family remains `introduced_focused_weighted_score`
+- full confirmation supports keeping the weighted training-free verifier as the main evidence surface
+
+## 13. Full Main Metrics
+
+Full `40504`-image adapted evaluation:
+
+| Method | CHAIRs | CHAIRi | Object Mentions | Correct Object Count | Hallucinated Object Count | Edited Images | Edited Mentions | Correct Delta vs fixed | Hallucinated Delta vs fixed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `regular` | `0.2037` | `0.0655` | `181268` | `169393` | `11875` | `0` | `0` | `-8438` | `+2266` |
+| fixed `first_logit` | `0.1631` | `0.0513` | `187440` | `177831` | `9609` | `0` | `0` | `0` | `0` |
+| `firstlogit_removal_top10` | `0.1291` | `0.0413` | `181848` | `174332` | `7516` | `4463` | `5540` | `-3499` | `-2093` |
+| `dual_phrase_replace_v1` | `0.1403` | `0.0444` | `184391` | `176204` | `8187` | `3037` | `3037` | `-1627` | `-1422` |
+
+Full-scale reading:
+
+- both retained correction branches still beat fixed `first_logit`
+- `firstlogit_removal_top10` stays the metric-strong aggressive branch
+- `dual_phrase_replace_v1` stays the quality-preserving branch
+- the `5000`-image story did not flip at full scale
+
+## 14. Full Risk-Benefit And Quality Takeaways
+
+Full diagnostic slices:
+
+- removal `top5 / top10 / top20` CHAIRs:
+  - `0.1422 / 0.1291 / 0.1105`
+- dual `top5 / top10 / top20` CHAIRs:
+  - `0.1507 / 0.1403 / 0.1248`
+
+Preservation ratios:
+
+- removal hallucination reduction per correct-loss:
+  - `top5 0.5334`
+  - `top10 0.6060`
+  - `top20 0.6504`
+- dual hallucination reduction per correct-loss:
+  - `top5 0.9680`
+  - `top10 0.8772`
+  - `top20 0.8332`
+
+Quality review at full scale:
+
+- removal grammar/coherence issue rate: `0.0449`
+- dual grammar/coherence issue rate: markedly lower and still the cleaner local-language branch
+- removal correct-loss concentration remains visible in categories such as `chair`, `remote`, `person`, and `cup`
+- dual still performs real phrase replacement:
+  - replaced phrase count: `623`
+- dual did not collapse into a pure removal-only route
+
+Current conclusion:
+
+- `top10` remains the preregistered default operating slice
+- `top20` still behaves like a diagnostic upper bound, not the default reportable action
+- both branches should still be retained
+
+## 15. Full Near-Official Alignment
+
+Full near-official Python3 alignment was successfully reused without touching the official Python2 script.
+
+Near-official full results:
+
+- `regular`
+  - `CHAIRs=0.1997`
+  - `CHAIRi=0.0669`
+- fixed `first_logit`
+  - `CHAIRs=0.1594`
+  - `CHAIRi=0.0524`
+- `firstlogit_removal_top10`
+  - `CHAIRs=0.1267`
+  - `CHAIRi=0.0424`
+- `dual_phrase_replace_v1`
+  - `CHAIRs=0.1374`
+  - `CHAIRi=0.0455`
+
+Alignment takeaway:
+
+- ordering matches the adapted evaluator
+- full near-official supports the same main ranking:
+  - `firstlogit_removal_top10` best raw score
+  - `dual_phrase_replace_v1` second-best and more preservation-friendly
+
 Shared pattern:
 
 - both methods mainly act on source-exclusive risky mentions
 - this is good news for the current mechanism story, because the verifier is not mostly firing on shared/common objects
 
-## 12. Near-Official Alignment
+## 16. Historical `5000` Near-Official Alignment
 
-Near-official `5000`-subset alignment was completed on the same expanded subset without rerunning captions.
+Keep the old expanded subset alignment for reference:
 
 | Method | CHAIRs | CHAIRi | Object Mentions | Hallucinated Objects |
 |---|---:|---:|---:|---:|
@@ -274,28 +379,25 @@ Near-official `5000`-subset alignment was completed on the same expanded subset 
 | `firstlogit_removal_top10` | `0.1318` | `0.0448` | `21631` | `970` |
 | `dual_phrase_replace_v1` | `0.1430` | `0.0482` | `21920` | `1056` |
 
-Alignment reading:
+Why keep it:
 
-- the method ordering is unchanged under the near-official path
-- `firstlogit_removal_top10` still gives the best raw CHAIR reduction
-- `dual_phrase_replace_v1` still improves clearly over fixed `first_logit`
-- the expanded adapted-evaluator conclusion is therefore not a scoring artifact
+- it preserves the earlier expanded confirmation checkpoint
+- it shows the full result did not reverse the `5000` ordering
 
-## 13. Whether Results Are Strong Enough For Full Confirmation Or Paper Discussion
+## 17. Whether Results Are Strong Enough For Full Confirmation Or Paper Discussion
 
 Current judgment:
 
-- strong enough for a user-approved full-confirmation discussion: `yes`
-- strong enough to auto-start full confirmation without approval: `no`
-- strong enough for paper-positioning discussion: `yes`, with the usual near-official caveat
+- full confirmation: `completed`
+- strong enough for paper-positioning discussion: `yes`
+- strong enough to collapse to a single branch automatically: `no`
 
-Why not auto-full:
+Interpretation:
 
-- full weighted risk extraction is still missing
-- projected full probe-only time is about `25.7 h`
-- this round already achieved a meaningful scale-up from `1000` to `5000`
+- the data requirement for score-first confirmation is now satisfied
+- the next discussion can move to how to present the two-branch result, not whether the branches survive scale-up
 
-## 14. Which Branch Is Metric-Strong
+## 18. Which Branch Is Metric-Strong
 
 Metric-strong branch:
 
@@ -304,9 +406,9 @@ Metric-strong branch:
 Current role:
 
 - aggressive correction candidate
-- likely upper-bound-style route for raw hallucination reduction
+- upper-bound-style route for maximum hallucination reduction under the current verifier
 
-## 15. Which Branch Is Quality-Preserving
+## 19. Which Branch Is Quality-Preserving
 
 Quality-preserving branch:
 
@@ -315,27 +417,22 @@ Quality-preserving branch:
 Current role:
 
 - cleaner phrase-level correction candidate
-- better aligned with a paper narrative centered on preserving supported content while editing unsupported local mentions
+- better aligned with a story centered on preserving supported content while editing unsupported local mentions
 
-## 16. Remaining Caveats
+## 20. Remaining Caveats And Next Recommendation
 
-- this is still expanded confirmation, not full `40504`-image confirmation
+Remaining caveats:
+
 - the verifier is still sharper on source-exclusive mentions than on common mentions
 - `firstlogit_removal_top10` still raises the "fewer objects" challenge if presented without preservation metrics
-- `dual_phrase_replace_v1` still removes many mentions and is not a pure replacement method
-- near-official alignment is stronger than adapted-only evaluation, but it is still not untouched official Python2 CHAIR
+- `dual_phrase_replace_v1` still mixes real replacement with conservative removal, rather than being a pure replacement-only method
+- near-official alignment is strong supporting evidence, but it is still the Python3 alignment path rather than untouched official Python2 execution
 
-## 17. Next Recommendation
+Next recommendation:
 
-The clean next-step discussion is now:
-
-1. whether to run a user-approved full two-branch confirmation
-2. or whether the current `5000`-image expanded confirmation is already sufficient for paper-level method positioning
-
-What should stay fixed:
-
-- keep both branches alive
-- do not let Codex auto-eliminate one branch
-- do not let Codex auto-start a full extraction run
-- keep the weighted training-free verifier as the primary evidence source
-- keep the classifier only as backup / diagnostic
+1. keep both branches alive for paper-facing discussion
+2. present `firstlogit_removal_top10` as the metric-strong aggressive branch
+3. present `dual_phrase_replace_v1` as the quality-preserving branch
+4. keep the weighted training-free verifier as the main evidence source
+5. keep the classifier only as backup / diagnostic
+6. do not let Codex auto-start a new method line without explicit user approval
