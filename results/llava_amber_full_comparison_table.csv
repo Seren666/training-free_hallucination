@@ -1,0 +1,6 @@
+method,chair,cover,hal,cog,delta_chair_vs_regular,delta_cover_vs_regular,delta_hal_vs_regular,delta_cog_vs_regular,delta_chair_vs_fixed,delta_cover_vs_fixed,delta_hal_vs_fixed,delta_cog_vs_fixed,role
+regular,7.0,50.5,32.3,3.8,0.0,0.0,0.0,0.0,2.2,1.7,7.8,1.6,"baseline"
+fixed_flb_equivalent,4.8,48.8,24.5,2.2,-2.2,-1.7,-7.8,-1.6,0.0,0.0,0.0,0.0,"improved generation-control baseline"
+firstlogit_removal_top10,4.7,48.7,23.7,2.0,-2.3,-1.8,-8.6,-1.8,-0.1,-0.1,-0.8,-0.2,"metric-strong aggressive diagnostic branch"
+dual_phrase_replace_v1,4.7,48.8,24.0,2.1,-2.3,-1.7,-8.3,-1.7,-0.1,0.0,-0.5,-0.1,"quality-preserving retained branch"
+candidateA_removal_top10_firstlogit_only_guard,4.7,48.8,23.9,2.1,-2.3,-1.7,-8.4,-1.7,-0.1,0.0,-0.6,-0.1,"safer source-aware removal retained branch"
