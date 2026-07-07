@@ -1,0 +1,49 @@
+model,benchmark,method,source_caption_type,status,sample_count,primary_metric_name,primary_value,secondary_metric_name,secondary_value,cover_value,cog_value,edit_count,caveat
+LLaVA-1.5-7B,COCO/CHAIR-500,Regular,regular,completed,500,CHAIRs,0.1720,CHAIRi,0.0511,,,0,source baseline
+LLaVA-1.5-7B,COCO/CHAIR-500,FLB,strict_flb,completed,500,CHAIRs,0.1560,CHAIRi,0.0470,,,0,source baseline
+LLaVA-1.5-7B,COCO/CHAIR-500,OCV (Regular source),regular,completed,500,CHAIRs,0.1220,CHAIRi,0.0348,,,111,artifact-backed OCV row from the final COCO/AMBER matrix
+LLaVA-1.5-7B,COCO/CHAIR-500,OCV (FLB source),strict_flb,completed,500,CHAIRs,0.1100,CHAIRi,0.0349,,,104,artifact-backed OCV row from the final COCO/AMBER matrix
+LLaVA-1.5-7B,AMBER-1004,Regular,regular,completed,1004,AMBER CHAIR,11.6,AMBER Hal,48.2,50.9,4.2,0,source baseline
+LLaVA-1.5-7B,AMBER-1004,FLB,strict_flb,completed,1004,AMBER CHAIR,6.1,AMBER Hal,31.6,50.1,2.7,0,source baseline
+LLaVA-1.5-7B,AMBER-1004,OCV (Regular source),regular,completed,1004,AMBER CHAIR,8.8,AMBER Hal,40.5,49.5,3.5,514,artifact-backed OCV row from the final COCO/AMBER matrix
+LLaVA-1.5-7B,AMBER-1004,OCV (FLB source),strict_flb,completed,1004,AMBER CHAIR,5.0,AMBER Hal,25.0,47.8,2.3,547,best hallucination metric row in this cell; AMBER Cover tradeoff should be reported
+LLaVA-1.5-7B,OpenCHAIR,Regular,regular,completed,4863,OpenCHAIR,0.180299,Sentence,0.577627,,,0,OpenCHAIR local offline evaluator with local Qwen2.5-VL text-only judge.
+LLaVA-1.5-7B,OpenCHAIR,FLB,strict_flb,completed,4863,OpenCHAIR,0.162093,Sentence,0.548427,,,0,Strict FLB verified; also greatly reduces multiline pollution.
+LLaVA-1.5-7B,OpenCHAIR,OCV (Regular source),regular,completed,4863,OpenCHAIR,0.173015,Sentence,0.54452,,,2956,mapped from the OpenCHAIR main matrix; improves hallucination score with a preservation tradeoff reported by mention and judge counts
+LLaVA-1.5-7B,OpenCHAIR,OCV (FLB source),strict_flb,completed,4863,OpenCHAIR,0.158447,Sentence,0.523956,,,3219,mapped from the OpenCHAIR main matrix; use as the OCV FLB-source appendix row with preservation tradeoff reported
+InstructBLIP-7B,COCO/CHAIR-500,Regular,regular,completed,500,CHAIRs,0.2620,CHAIRi,0.0936,,,0,source baseline
+InstructBLIP-7B,COCO/CHAIR-500,FLB,strict_flb,completed,500,CHAIRs,0.2360,CHAIRi,0.0758,,,0,source baseline
+InstructBLIP-7B,COCO/CHAIR-500,OCV (Regular source),regular,completed,500,CHAIRs,0.2620,CHAIRi,0.0936,,,0,completed end-to-end but selected zero surviving edits; metrics tie Regular
+InstructBLIP-7B,COCO/CHAIR-500,OCV (FLB source),strict_flb,completed,500,CHAIRs,0.1340,CHAIRi,0.0464,,,174,clean final rerun with substantial edit count; use as the OCV FLB-source appendix row
+InstructBLIP-7B,AMBER-1004,Regular,regular,completed,1004,AMBER CHAIR,14.1,AMBER Hal,59.0,53.2,6.2,0,source baseline
+InstructBLIP-7B,AMBER-1004,FLB,strict_flb,completed,1004,AMBER CHAIR,10.9,AMBER Hal,52.5,54.5,6.2,0,source baseline
+InstructBLIP-7B,AMBER-1004,OCV (Regular source),regular,completed,1004,AMBER CHAIR,12.1,AMBER Hal,53.0,51.4,5.4,736,artifact-backed OCV row from the final COCO/AMBER matrix
+InstructBLIP-7B,AMBER-1004,OCV (FLB source),strict_flb,completed,1004,AMBER CHAIR,10.3,AMBER Hal,48.4,52.5,5.7,848,artifact-backed OCV row from the final COCO/AMBER matrix
+InstructBLIP-7B,OpenCHAIR,Regular,regular,completed,4863,OpenCHAIR,0.173145,Sentence,0.563233,,,0,OpenCHAIR full evaluator completed successfully.
+InstructBLIP-7B,OpenCHAIR,FLB,strict_flb,completed,4863,OpenCHAIR,0.173145,Sentence,0.563233,,,0,Strict FLB branch executed but produced 0 caption changes vs Regular and saved processor summaries do not verify hook entry; treat as regular-equivalent source in this round.
+InstructBLIP-7B,OpenCHAIR,OCV (Regular source),regular,completed,4863,OpenCHAIR,0.166681,Sentence,0.538968,,,2664,mapped from the OpenCHAIR main matrix; improves hallucination score with a preservation tradeoff reported by mention and judge counts
+InstructBLIP-7B,OpenCHAIR,OCV (FLB source),strict_flb_equivalent,completed,4863,OpenCHAIR,0.166681,Sentence,0.538968,,,2664,FLB-source artifact is numerically regular-equivalent in this run; use with caveat.
+InternVL3.5-8B-HF,COCO/CHAIR-500,Regular,regular,completed,500,CHAIRs,0.1400,CHAIRi,0.0528,,,0,shared prompt on InternVL is multiline-heavy
+InternVL3.5-8B-HF,COCO/CHAIR-500,FLB,strict_flb,completed,500,CHAIRs,0.1400,CHAIRi,0.0510,,,0,strict FLB verified and active
+InternVL3.5-8B-HF,COCO/CHAIR-500,OCV (Regular source),regular,completed,500,CHAIRs,0.1360,CHAIRi,0.0527,,,93,positive vs Regular but smaller than on-FLB
+InternVL3.5-8B-HF,COCO/CHAIR-500,OCV (FLB source),strict_flb,completed,500,CHAIRs,0.1320,CHAIRi,0.0506,,,122,best overall COCO row
+InternVL3.5-8B-HF,AMBER-1004,Regular,regular,completed,1004,AMBER CHAIR,4.9,AMBER Hal,20.6,48.0,0.7,0,baseline
+InternVL3.5-8B-HF,AMBER-1004,FLB,strict_flb,completed,1004,AMBER CHAIR,4.6,AMBER Hal,20.7,47.2,0.6,0,best CHAIR row and strict FLB verified
+InternVL3.5-8B-HF,AMBER-1004,OCV (Regular source),regular,completed_partial_coverage,1004,AMBER CHAIR,4.9,AMBER Hal,20.5,47.8,0.7,109,CHAIR ties Regular and Hal improves slightly but grouped probe had 1396 OOM failure rows
+InternVL3.5-8B-HF,AMBER-1004,OCV (FLB source),strict_flb,completed_partial_coverage,1004,AMBER CHAIR,4.7,AMBER Hal,20.5,47.1,0.6,134,Hal improves vs strict FLB but CHAIR is worse and grouped probe had 1477 OOM failure rows
+InternVL3.5-8B-HF,OpenCHAIR,Regular,regular,completed,4863,OpenCHAIR,0.234034,Sentence,0.748509,,,0,Regular baseline is highly open-vocabulary and multiline-heavy on OpenCHAIR.
+InternVL3.5-8B-HF,OpenCHAIR,FLB,strict_flb,completed,4863,OpenCHAIR,0.227516,Sentence,0.744602,,,0,Strict FLB hook entered and applied on all 4863 samples.; it improves raw OpenCHAIR but also increases mention volume and multiline count.
+InternVL3.5-8B-HF,OpenCHAIR,OCV (Regular source),regular,completed,4863,OpenCHAIR,0.225923,Sentence,0.710261,,,3672,mapped from the OpenCHAIR main matrix; improves hallucination score with a preservation tradeoff reported by mention and judge counts
+InternVL3.5-8B-HF,OpenCHAIR,OCV (FLB source),strict_flb,completed,4863,OpenCHAIR,0.221839,Sentence,0.711701,,,3964,mapped from the OpenCHAIR main matrix; use as the OCV FLB-source appendix row with preservation tradeoff reported
+Qwen2.5-VL-7B-Instruct,COCO/CHAIR-500,Regular,regular,completed,500,CHAIRs,0.0520,CHAIRi,0.0360,,,0,clean reused baseline under locked Qwen single-sentence protocol
+Qwen2.5-VL-7B-Instruct,COCO/CHAIR-500,FLB,strict_flb,completed,500,CHAIRs,0.0440,CHAIRi,0.0318,,,0,clean reused strict FLB baseline
+Qwen2.5-VL-7B-Instruct,COCO/CHAIR-500,OCV (Regular source),regular,completed,500,CHAIRs,0.0360,CHAIRi,0.0270,,,71 changed rows / 64 edited images,full replay complete; aggressive edit volume
+Qwen2.5-VL-7B-Instruct,COCO/CHAIR-500,OCV (FLB source),strict_flb,completed,500,CHAIRs,0.0320,CHAIRi,0.0251,,,68 changed rows / 57 edited images,full replay complete
+Qwen2.5-VL-7B-Instruct,AMBER-1004,Regular,regular,completed,1004,AMBER CHAIR,3.3,AMBER Hal,7.9,40.9,0.3,0,clean reused baseline under locked Qwen single-sentence protocol
+Qwen2.5-VL-7B-Instruct,AMBER-1004,FLB,strict_flb,completed,1004,AMBER CHAIR,3.3,AMBER Hal,7.6,40.7,0.3,0,clean reused strict FLB baseline
+Qwen2.5-VL-7B-Instruct,AMBER-1004,OCV (Regular source),regular,completed,1004,AMBER CHAIR,3.4,AMBER Hal,7.7,39.1,0.3,125 changed rows / 122 edited images,protocol-clean full rerun completed; Hal slightly lower but Cover drops
+Qwen2.5-VL-7B-Instruct,AMBER-1004,OCV (FLB source),strict_flb,completed,1004,AMBER CHAIR,3.4,AMBER Hal,7.5,38.8,0.3,125 changed rows / 121 edited images,protocol-clean full rerun completed; Hal slightly lower but Cover drops
+Qwen2.5-VL-7B-Instruct,OpenCHAIR,Regular,regular,completed,4863,OpenCHAIR,0.182521,Sentence,0.427103,,,0 edits,clean reused baseline
+Qwen2.5-VL-7B-Instruct,OpenCHAIR,FLB,strict_flb,completed,4863,OpenCHAIR,0.178789,Sentence,0.409212,,,0 edits,clean reused strict FLB baseline
+Qwen2.5-VL-7B-Instruct,OpenCHAIR,OCV (Regular source),regular,completed,4863,OpenCHAIR,0.178194,Sentence,0.394818,,,1910 changed rows / 1564 edited images,fresh protocol-clean evaluation in the Blackwell-compatible environment; judge cache was not reused
+Qwen2.5-VL-7B-Instruct,OpenCHAIR,OCV (FLB source),strict_flb,completed,4863,OpenCHAIR,0.172571,Sentence,0.376517,,,1929 changed rows / 1533 edited images,fresh protocol-clean evaluation in the Blackwell-compatible environment; judge cache was not reused

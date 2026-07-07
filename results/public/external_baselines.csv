@@ -1,0 +1,13 @@
+method,method_type,benchmark,scope,chairs,chairi,pope_accuracy,pope_f1,sample_count,status,comparable_to_ours,caveat
+regular,main internal baseline,COCO/CHAIR,locked CHAIR-500,0.1880,0.0561,,,500,main_baseline,yes,Main caption baseline under the locked subset and current evaluator.
+fixed_FLB_equivalent,internal stronger-source generation control,COCO/CHAIR,locked CHAIR-500,0.1440,0.0429,,,500,internal_reference,yes,Stronger-source OCV variant; not an external baseline.
+firstlogit_removal_top10,internal stronger-source bounded edit,COCO/CHAIR,locked CHAIR-500,0.1160,0.0353,,,500,internal_reference,yes,Stronger-source OCV variant; not an external baseline.
+dual_phrase_replace_v1,internal retained edit,COCO/CHAIR,locked CHAIR-500,0.1260,0.0378,,,500,internal_reference,yes,Retained internal branch; not an external baseline.
+VCD,external contrastive decoding,COCO/CHAIR,locked CHAIR-500,0.2220,0.0779,,,500,external_actual_score,yes,Same-protocol reproduction only; weak under our caption protocol; not an official native caption result.
+AGLA,external global-local attention assembly,COCO/CHAIR,locked CHAIR-500,0.1900,0.0578,,,500,external_actual_score,yes,"Repo is more native to POPE than to CHAIR, but the caption-side reproduction is stable and evaluator-compatible."
+MaskCD,external masked contrastive decoding,COCO/CHAIR,locked CHAIR-500,0.3460,0.1014,,,500,external_actual_score,yes,"Protocol-compatible and caption-native, but outputs are long and templated and inflate object commitments."
+DeCo,external decoding baseline,COCO/CHAIR,smoke10,0.1000,0.0278,,,10,smoke_only,no,Quality unstable; safe_to_run_chair500=no; not a carried score line.
+DeCo,external decoding baseline,COCO/CHAIR,locked CHAIR-500,0.1560,0.0559,,,500,external_actual_score,yes,"Completed full row, but quality remains truncation-heavy: 474/500 hit max_new_tokens and 107/500 show obvious dangling endings."
+regular,main internal baseline,POPE,COCO 3-split average,,,0.8552,0.8407,9000,main_baseline,yes,COCO-only average; do not mix with the separate 27k all-dataset average.
+AGLA,external global-local attention assembly,POPE,COCO 3-split average,,,0.8574,0.8437,9000,external_actual_score,yes,COCO only in this round; GQA and AOKVQA were not rerun here.
+VCD,external contrastive decoding,POPE,COCO 3-split average,,,0.8341,0.8217,9000,caveated_actual_score,no,Mixed-provenance head-to-head; do not treat this row as a clean official VCD verdict.

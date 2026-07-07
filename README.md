@@ -1,27 +1,63 @@
-# training-free_hallucination
+# Training-Free Hallucination Mitigation
 
-This repository is the lightweight paper-facing workspace for the new training-free LVLM object hallucination project.
+A lightweight research workspace for post-decoding, training-free mitigation of LVLM/VLM object hallucination.
 
-Current focus:
+This repository contains a sanitized public record of experiments around **Object Commitment Verification (OCV)**: a bounded post-decoding verifier that scores object mentions in generated captions and edits only high-risk unsupported commitments. The public repo focuses on aggregate metrics, reproducible tables, and non-sensitive utility code. It does not include model weights, datasets, raw generations, private manuscript files, or remote-machine credentials.
 
-- task: object hallucination
-- initial benchmark: POPE
-- first-priority baseline: FLB / first-logit
-- current stage: migration, environment inventory, and planning only
+## What Is Included
 
-Repository rules:
+- Method notes: [docs/method_overview.md](docs/method_overview.md)
+- Experiment protocol: [docs/experiment_protocol.md](docs/experiment_protocol.md)
+- Public aggregate result tables: [results/public/](results/public/)
+- Result analysis and limitations: [docs/result_analysis.md](docs/result_analysis.md), [docs/limitations.md](docs/limitations.md)
+- Small utility package for bounded post-decoding edits and score aggregation: [src/hallucination_mitigation/](src/hallucination_mitigation/)
+- Table generation and repository hygiene scripts: [scripts/](scripts/)
 
-- keep `object_hallucination_research_notes.md` as the living research note
-- keep legacy VCD findings only as lightweight summaries under `project_context/legacy_handoff/`
-- do not store models, datasets, raw outputs, cache, or large logs in this repository
-- run heavy baseline cloning, downloads, and experiments on the remote machine only
+## Key Caption-Side Results
 
-Main structure:
+Lower values are better for all hallucination metrics below. These are aggregate rows from completed local/remote experiment artifacts; raw generations and datasets are intentionally excluded.
 
-- `object_hallucination_research_notes.md`: current living research note
-- `project_context/legacy_handoff/`: legacy VCD summaries, remote paths, and run-command provenance
-- `project_context/planning/`: current planning documents
-- `project_context/remote/`: remote environment inventory
-- `project_context/literature/`: official paper/code link notes
-- `project_context/baseline_notes/`: lightweight baseline run summaries when experiments begin
+| Model | Benchmark | Regular | FLB | OCV on FLB | Main delta vs FLB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| LLaVA-1.5-7B | COCO/CHAIR-500 CHAIRs | 0.1720 | 0.1560 | **0.1100** | 0.0460 lower |
+| InstructBLIP-7B | COCO/CHAIR-500 CHAIRs | 0.2620 | 0.2360 | **0.1340** | 0.1020 lower |
+| LLaVA-1.5-7B | AMBER-1004 Hal | 48.2 | 31.6 | **25.0** | 6.6 lower |
+| InstructBLIP-7B | AMBER-1004 Hal | 59.0 | 52.5 | **48.4** | 4.1 lower |
+| LLaVA-1.5-7B | OpenCHAIR | 0.1803 | 0.1621 | **0.1584** | 0.0036 lower |
+| InstructBLIP-7B | OpenCHAIR | 0.1731 | 0.1731* | **0.1667** | 0.0065 lower |
 
+`*` In this InstructBLIP OpenCHAIR run, the reproduced FLB source was regular-equivalent, so the FLB row is not evidence that FLB is generally ineffective.
+
+The strongest clean headline row is the InstructBLIP COCO/CHAIR-500 setting: OCV on FLB source reduces CHAIRs from 0.2360 to 0.1340 relative to FLB and from 0.2620 to 0.1340 relative to regular generation.
+
+## Reproduce Public Tables
+
+The checked-in tables are generated from the small CSV files in `results/public/`:
+
+```bash
+python scripts/make_tables.py
+```
+
+Run basic repository checks:
+
+```bash
+python scripts/check_repo_hygiene.py
+python -m unittest discover -s tests
+```
+
+Full benchmark reruns require user-provided LVLM checkpoints and benchmark data. Those artifacts are not redistributed here.
+
+## External Baselines
+
+The repository includes same-protocol or caveated external baseline summaries for VCD, AGLA, MaskCD, and DeCo in [results/public/external_baselines.csv](results/public/external_baselines.csv). They are kept separate from the main OCV table because several reproduced baselines have protocol or output-quality caveats.
+
+## Limitations
+
+- This is a research workspace, not an official benchmark package.
+- The public repo contains aggregate result records and lightweight utilities, not full raw generations.
+- Some settings show small gains or trade-offs; Qwen2.5-VL and some AMBER rows should be read as boundary cases.
+- OCV is training-free and post-decoding: it does not update model parameters and depends on the availability of safely editable unsupported object commitments.
+
+## Citation Status
+
+No acceptance, publication, or SOTA claim is made by this repository.

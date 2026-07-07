@@ -1,10 +1,10 @@
 .claude/
+.env
+.env.*
 
-# Legacy local-only project material to keep out of the new lightweight repo
-docs/
-experiments/
+# Internal planning drafts and local-only working notes
+docs/superpowers/
 reports/
-与导师交流/
 EXPERIMENT_ARTIFACT_POLICY.md
 MAIN_IDEA.md
 idea01.md
@@ -28,6 +28,9 @@ datasets/
 hf-home/
 .cache/
 .huggingface/
+wandb/
+runs/
+tensorboard/
 **/__pycache__/
 *.jsonl
 *.parquet
@@ -42,3 +45,10 @@ hf-home/
 *.pth
 *.safetensors
 
+# Local generated manuscript exports are intentionally not part of this repo.
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz

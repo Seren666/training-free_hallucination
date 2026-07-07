@@ -1,0 +1,14 @@
+model,benchmark,stage,stage_group,source_caption_type,measurement_source,num_images,total_sec,sec_per_image,gpu_model,includes_generation_time,includes_signal_extraction_forward,caveat
+LLaVA-1.5-7B,COCO/CHAIR-500,Regular generation,generation,regular,fresh_remote_microbenchmark,20,20.6637,1.033185,NVIDIA RTX PRO 6000 Blackwell Server Edition,yes,no,
+LLaVA-1.5-7B,COCO/CHAIR-500,Regular generation,generation,regular,existing_artifact,500,unknown,1.288,unknown,yes,no,
+LLaVA-1.5-7B,COCO/CHAIR-500,FLB generation,generation,strict_flb,existing_artifact,500,unknown,1.2923,unknown,yes,no,
+LLaVA-1.5-7B,COCO/CHAIR-500,OCV signal extraction,verification_forward,regular,existing_artifact,495,unknown,0.053347,unknown,no,yes,
+InstructBLIP-7B,COCO/CHAIR-500,Regular generation,generation,regular,existing_artifact,500,unknown,1.2221,unknown,yes,no,
+InstructBLIP-7B,COCO/CHAIR-500,FLB generation,generation,strict_flb,existing_artifact,500,unknown,1.2368,unknown,yes,no,
+InstructBLIP-7B,COCO/CHAIR-500,OCV verification forward,verification_forward,regular_and_flb,fresh_remote_microbenchmark,20,1.7763,0.088816,NVIDIA RTX PRO 6000 Blackwell Server Edition,no,yes,
+InstructBLIP-7B,COCO/CHAIR-500,OCV verification forward,verification_forward,regular,fresh_remote_microbenchmark,20,0.5071,0.025356,NVIDIA RTX PRO 6000 Blackwell Server Edition,no,yes,
+InstructBLIP-7B,COCO/CHAIR-500,OCV verification forward,verification_forward,strict_flb,fresh_remote_microbenchmark,20,0.4457,0.022287,NVIDIA RTX PRO 6000 Blackwell Server Edition,no,yes,
+InstructBLIP-7B,COCO/CHAIR-500,OCV signal extraction,verification_forward,regular,existing_artifact,489,unknown,0.02223,unknown,no,yes,
+InstructBLIP-7B,COCO/CHAIR-500,OCV signal extraction,verification_forward,strict_flb,existing_artifact,498,unknown,0.027573,unknown,no,yes,
+all artifact-backed rows,mixed,risk scoring table aggregation,risk_scoring_only,existing captions,fresh_local_cpu_micro_timing,not_applicable,0.002106,not_applicable,not_used,no,no,CPU aggregation timing only; not comparable to model inference.
+all artifact-backed rows,mixed,bounded-editing summary aggregation,editing_only_summary,existing captions,fresh_local_cpu_micro_timing,not_applicable,0.00134,not_applicable,not_used,no,no,CPU summary timing only; actual editing replay timing should be measured inside the evaluator pipeline if needed.
