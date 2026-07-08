@@ -4,6 +4,14 @@ A lightweight research workspace for post-decoding, training-free mitigation of 
 
 This repository contains a sanitized public record of experiments around **Object Commitment Verification (OCV)**: a bounded post-decoding verifier that scores object mentions in generated captions and edits only high-risk unsupported commitments. The public repo focuses on aggregate metrics, reproducible tables, and non-sensitive utility code. It does not include model weights, datasets, raw generations, private manuscript files, or remote-machine credentials.
 
+## For Quick Review
+
+- [Headline result audit](docs/headline_result_audit.md): audited headline metrics and caveats.
+- [Result analysis](docs/result_analysis.md): aggregate result interpretation.
+- [Limitations](docs/limitations.md): limitations and non-claims.
+- [Method overview](docs/method_overview.md): method overview.
+- [Public result table](results/public/result_table.md): public result table.
+
 ## What Is Included
 
 - Method notes: [docs/method_overview.md](docs/method_overview.md)
@@ -12,6 +20,17 @@ This repository contains a sanitized public record of experiments around **Objec
 - Result analysis and limitations: [docs/result_analysis.md](docs/result_analysis.md), [docs/limitations.md](docs/limitations.md)
 - Small utility package for bounded post-decoding edits and score aggregation: [src/hallucination_mitigation/](src/hallucination_mitigation/)
 - Table generation and repository hygiene scripts: [scripts/](scripts/)
+
+## Terminology
+
+- **Regular**: original caption generation without post-decoding intervention.
+- **FLB**: first-logit baseline, a decoding-stage baseline used in this workspace.
+- **OCV**: Object Commitment Verification, the bounded post-decoding verifier used here.
+- **CHAIRs / Hal / OpenCHAIR**: hallucination-oriented metrics where lower values are better.
+
+## Best Supported Public Result
+
+On COCO/CHAIR-500, InstructBLIP-7B CHAIRs decreases from 0.2360 under the first-logit decoding baseline to 0.1340 with OCV-on-FLB, a 43.2% relative reduction. This is an aggregate public result, not a SOTA or official benchmark claim.
 
 ## Key Caption-Side Results
 
